@@ -1,5 +1,5 @@
 'use strict';
-
+const checkConnection = require('./checkConnection');
 const pg = require('pg');
 
 const pool = new pg.Pool({
@@ -10,6 +10,7 @@ const pool = new pg.Pool({
    password: '5003255'
 });
 
+checkConnection(pool);
 module.exports = (table) => ({
    async query(sql, args) {
       return await pool.query(sql, args);
