@@ -2,7 +2,7 @@ const http = require('node:http')
 const pg = require('pg')
 const process = require('node:process')
 
-const PORT = 6666
+const PORT = 8800
 
 const pool = new pg.Pool({
   host: 'localhost',
@@ -25,7 +25,9 @@ async function checkConnection() {
 checkConnection();
 
 http.createServer(async (req, res) => {
-  res.end('foo')
+      const result = await pool.query('SELECT * FROM region');
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify(result.rows)); 
 }).listen(PORT)
 
 console.log(`Listen on port ${PORT}`);
