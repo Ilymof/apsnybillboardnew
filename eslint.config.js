@@ -6,18 +6,18 @@ module.exports = [
    {
       files: ['**/*.js'],
       languageOptions: {
-         sourceType: 'commonjs', // Используем CommonJS
+         sourceType: 'commonjs', 
          globals: {
-            ...globals.node, // Глобальные переменные для Node.js
+            ...globals.node, 
          },
       },
       rules: {
-         'semi': ['error', 'always'], // Точки с запятой обязательны
-         'quotes': ['error', 'single'], // Одинарные кавычки
+         'semi': ['error', 'always'], 
+         'quotes': ['error', 'single'], 
          'indent': ['error', 3, { 'SwitchCase': 1 }],
-         'eqeqeq': 'error', // Строгое равенство
-         'curly': 'error', // Всегда использовать {} для блоков
+         'eqeqeq': 'error', 
+         'curly': 'error', 
       },
    },
-   pluginJs.configs.recommended, // Рекомендуемые правила ESLint
+   pluginJs.configs.recommended,
 ];

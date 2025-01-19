@@ -1,7 +1,10 @@
 const http = require('node:http');
 const receiveArgs = require('./body.js');
 const db = require('./db.js');
-const PORT = 8800;
+
+require('dotenv').config();
+
+const PORT = process.env.PORT || 3000;
 
 const routing = {
    cities: db('city'),
