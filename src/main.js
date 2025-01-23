@@ -3,7 +3,7 @@ const server = require('./http.js')
 const migrations = require('./migrate.js')
 require('dotenv').config()
 
-const PORT =  process.env.PORT || 3333
+const PORT =  process.env.PORT 
 
 const routing = {
    cities: db('city'),

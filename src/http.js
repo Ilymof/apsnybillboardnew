@@ -23,7 +23,7 @@ const server = (routing, port = '3333') => {
       console.log(`${socket.remoteAddress} ${method} ${url}`)
       const result = await handler(...args)
       res.end(JSON.stringify(result.rows))
-   }).listen(port)
+   }).listen(port, () => console.log( `Успешный запуск сервера на порту:${port} `))
 }
 
 module.exports = server

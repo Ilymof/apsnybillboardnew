@@ -14,6 +14,8 @@ const runMigrations = async  () => {
       files.forEach(async file => {
          const sql =  fs.readFileSync(path.join(dir, file), 'utf-8')
          await pool.query(sql)
+         console.log(`Успешная миграция ${file}`)
+         
       })
    } catch (err) {
       console.error(err)
