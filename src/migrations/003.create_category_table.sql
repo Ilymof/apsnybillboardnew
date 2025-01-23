@@ -1,8 +1,6 @@
--- Удаляем таблицы, если они существуют
 DROP TABLE IF EXISTS subcategory;
 DROP TABLE IF EXISTS category;
 
--- Создаем таблицы заново
 CREATE TABLE category (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255) UNIQUE,
@@ -17,7 +15,6 @@ CREATE TABLE subcategory (
     path VARCHAR(255) UNIQUE
 );
 
--- Вставка данных
 INSERT INTO category (name, path, image) VALUES
 ('Электроника', '/electronics', 'electronics.jpg'),
 ('Одежда', '/clothing', 'clothing.jpg'),
