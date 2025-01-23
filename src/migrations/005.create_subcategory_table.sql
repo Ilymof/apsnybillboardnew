@@ -1,0 +1,7 @@
+DROP TABLE IF EXISTS subcategory;
+CREATE TABLE subcategory (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    categoryId INT NOT NULL REFERENCES category(id) ON DELETE CASCADE,
+    path VARCHAR(255) UNIQUE
+);
