@@ -1,0 +1,7 @@
+DROP TABLE IF EXISTS category;
+CREATE TABLE category (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) UNIQUE,
+    path VARCHAR(255) UNIQUE,
+    image VARCHAR(255)
+);
