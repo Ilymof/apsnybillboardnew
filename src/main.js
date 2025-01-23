@@ -1,19 +1,24 @@
-const db = require('./db.js')
+'use strict';
 const server = require('./http.js')
 const migrations = require('./migrate.js')
+const fsp = require('node:fs').promises
+const path = require('node:path')
 require('dotenv').config()
 
 const PORT =  process.env.PORT 
 
-const routing = {
-   cities: db('city'),
-}
-const init = async () => {
-   try {
-      await migrations(),
-      server(routing, PORT)
-   } catch (error) {
-      console.log(error)
+const apiPath = path.join(process.cwd(), '/src/api');
+const routing = {};
+
+
+(async () => {
+   const files = await fsp.readdir(apiPath)
+   for (const fileName of files) {
+      if (!fileName.endsWith('.js')) continue
+      const filePath = path.join(apiPath, fileName)
+      const serviceName = path.basename(fileName, '.js')
+      routing[serviceName] = require(filePath)
    }
-}
-init()
+   await migrations()
+   server(routing, PORT)
+})()
