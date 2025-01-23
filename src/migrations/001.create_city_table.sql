@@ -1,0 +1,5 @@
+DROP TABLE IF EXISTS city;
+CREATE TABLE city (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255)
+);
