@@ -1,59 +1,35 @@
 'use strict'
 
 const db = require('../db.js')
+const transformToCategoryStructure = require('../helpers/transformToCategoryStructure.js')
+const category = db('category')
 
 
-async function getCategoriesWithSubcategory(req, res) {
-            const sql = `
-            SELECT 
-                category.id,
-                category.name,
-                category.path,
-                category.image,
-                subcategory.id,
-                subcategory.name,
-                subcategory.path
-            FROM 
-                category
-            LEFT JOIN 
-                subcategory
-            ON 
-                category.id = subcategory.categoryId
-            ORDER BY 
-                category.id, subcategory.id;
-        `;
 
-        const result = await pool.query(sql);
-        const rows = result.rows;
-
-        // Преобразуем строки в структуру "категории с подкатегориями"
-        const categories = [];
-        const categoryMap = {};
-
-        for (const row of rows) {
-            // Проверяем, добавлена ли категория
-            if (!categoryMap[row.id]) {
-                categoryMap[row.id] = {
-                    id: row.id,
-                    name: row.name,
-                    path: row.path,
-                    image: row.image || null,
-                    subcategories: []
-                };
-                categories.push(categoryMap[row.id]);
-            }
-
-            // Добавляем подкатегорию, если она существует (id подкатегории не null)
-            if (row['subcategory.id']) {
-                categoryMap[row.id].subcategories.push({
-                    id: row['subcategory.id'],          
-                    name: row['subcategory.name'],      
-                    path: row['subcategory.path']      
-                });
-            }
-        }
-
-        return categories;
+module.exports = {
+	async read() {
+		const sql = `
+		SELECT 
+			c.id AS category_id,
+			c.name AS category_name,
+			c.path AS category_path,
+			c.image AS category_image,
+			s.id AS subcategory_id,
+			s.name AS subcategory_name,
+			s.path AS subcategory_path
+		FROM 
+			category c
+		LEFT JOIN 
+			subcategory s
+		ON 
+			c.id = s.categoryId;
+		`
+		try {
+			const { rows } = await category.query(sql);
+			return transformToCategoryStructure(rows);
+		} catch (err) {
+			console.error('Ошибка при выполнении запроса:', err);
+			throw err;
+		}
+	}
 }
-
-module.exports = db('category')
