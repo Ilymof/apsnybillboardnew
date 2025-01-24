@@ -15,8 +15,9 @@ const runMigrations = async () => {
       for (const file of files) {
          if (!file.endsWith('.sql')) continue
          const sql = fs.readFileSync(path.join(dir, file), 'utf-8');
+         const startTime = Date.now();
          await pool.query(sql);
-         console.log(`Успешная миграция ${file}`);
+         console.log(`Успешная миграция ${file} за ${Date.now() - startTime} мс`);
       }
    } catch (err) {
       console.error(`Ошибка миграции: ${err.message}`);
