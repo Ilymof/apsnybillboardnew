@@ -1,7 +1,8 @@
 'use strict'
 
 const db = require('../db.js')
-const transformToCategoryStructure = require('../helpers/transformToCategoryStructure.js')
+const UserMapper = require('../mappers/UserMapper.js')
+const { toCategoryContract } = UserMapper()
 const category = db('category')
 
 
@@ -26,7 +27,7 @@ module.exports = {
 		`
 		try {
 			const { rows } = await category.query(sql);
-			return transformToCategoryStructure(rows);
+			return toCategoryContract(rows);
 		} catch (err) {
 			console.error('Ошибка при выполнении запроса:', err);
 			throw err;

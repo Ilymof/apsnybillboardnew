@@ -1,5 +1,5 @@
 const http = require('node:http')
-const receiveArgs = require('./body.js')
+const receiveArgs = require('../body.js')
 const crud = { get: 'read', post: 'create', put: 'update', delete: 'delete' }
 
 const server = (routing, port = '3333') => {
