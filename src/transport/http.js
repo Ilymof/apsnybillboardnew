@@ -1,4 +1,12 @@
-const http = require('node:http')
+'use strict';
+const http = require('node:http');
+
+const receiveArgs = async (req) => {
+   const buffers = [];
+   for await (const chunk of req) buffers.push(chunk);
+   const data = Buffer.concat(buffers).toString();
+   return JSON.parse(data);
+};
 
 const HEADERS = {
    'X-XSS-Protection': '1; mode=block',
@@ -10,58 +18,27 @@ const HEADERS = {
    'Content-Type': 'application/json; charset=UTF-8',
 };
 
-const receiveArgs = async (req) => {
-   const buffers = [];
-   for await (const chunk of req) buffers.push(chunk);
-   const data = Buffer.concat(buffers).toString();
-   return JSON.parse(data);
-};
-
-const server = (routing, port = '3333') => {
+module.exports = (routing, port) => {
    http.createServer(async (req, res) => {
-      const urlObj = new URL(req.url, `http://${req.headers.host}`);
-      const id = urlObj.searchParams.get('id');
+      res.writeHead(200, HEADERS);
       const { url, socket } = req;
+      const urlObj = new URL(req.url, `http://${req.headers.host}`);
       const [place, name, method] = urlObj.pathname.substring(1).split('/');
-      if (place !== 'api') {
-         res.writeHead(404);
-         return res.end('Not found');
-      }
+      if (place !== 'api') return void res.end('"Not found"');
       const entity = routing[name];
-      if (!entity) {
-         res.writeHead(404);
-         return res.end('Not found');
-      }
-      const handler = entity[method.toLowerCase()];
-      if (!handler) {
-         res.writeHead(405);
-         return res.end('Method Not Allowed');
-      }
-      let body = {};
-      if (method === 'POST') {
-         try {
-            body = await receiveArgs(req);
-         } catch (error) {
-            res.writeHead(400);
-            return res.end('Invalid request body');
-         }
-      }
-      const args = [];
-      const src = handler.toString();
-      const signature = src.substring(0, src.indexOf(')'));
-      if (signature.includes('(id')) args.push(id);
-      if (signature.includes('{') && typeof body === 'object') {
-         args.push(...Object.values(body));
+      if (!entity) return void res.end('"Not found"');
+      const handler = entity[method];
+      if (!handler) return void res.end('"Not found"');
+      if (req.method === 'GET') {
+         const params = Object.fromEntries(urlObj.searchParams.entries());
+         const result = await handler(params);
+         res.end(JSON.stringify(result));
+      } else {
+         const args = await receiveArgs(req);
+         const result = await handler(args);
+         res.end(JSON.stringify(result));
       }
       console.log(`${socket.remoteAddress} ${method} ${url}`);
-      try {
-         const result = await handler(...args);
-         res.end(JSON.stringify(result));
-      } catch (error) {
-         res.writeHead(500);
-         res.end('Internal server error');
-      }
-   }).listen(port, () => console.log(`Успешный запуск сервера на порту: ${port}`));
+   }).listen(port);
+   console.log(`API on port ${port}`);
 };
-
-module.exports = server

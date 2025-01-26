@@ -10,4 +10,4 @@ const pipe = (...fns) => input => {
   }, input);
 };
 
-module.exports = pipe
+module.exports = { pipe }

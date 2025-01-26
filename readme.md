@@ -1,45 +1,17 @@
-На вход принимает request
-
-Надо создать механизм, который позволяет на основе входящего req, а точнее url, method, а так же файловой системе строить динамически routing для API запросов.
-
-Первое что надо сделать - Придумать по каким правилам будут строиться url
-
-Второе определить как при помощи файловой системы строить url в соответсвии с правилами 
-
-Третий этап, нужно построить промежуточный объект, который будет строиться на основе файловой системы
-
-Четвертый этап, нужно научить мой сервер вытаскивал из req данные так, чтобы успешно обрабатывать объект routing
-
-## Контракты
-
-req: {
-  url: 'string',
-  method: 'get | post | put | delete | patch'
-}
-RoutingObject: {
-  rout_name: {
-    http_method: handler
-  }
-}
-rout_name - строиться из файловой структуры
-http_method - вляется методом http, по своей сути я в js файлах буду создавать структуту подобную этой :
+login: 
+Что я ожидаю
 {
-  async query () {
-
-  }
-
-  async read () {
-
-  }
-  
-  async create () {
-
-  }
-  ...
+  ip: string, 
+  useragent: string,
+  auth_provider: string, 
+  provider_user_id: string,
+  full_name: string,
+  hash: string
 }
-Предполагается, что само название функции не так уж и сильно важно.
-handler - сама функция 
-loadRouting (apiDir: string, params: any{}): RoutingObject => 
 
+Что я верну в случае успеха
 
-
+{
+  access_token: string, 
+  refres_token: string
+}

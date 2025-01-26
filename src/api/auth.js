@@ -1,10 +1,8 @@
 'use strict'
+const pipe = require('../lib/pipe.js')
 
 module.exports = {
-  async login() {
-    return JSON.stringify('hello')
-  },
-  async logout() {
-
+  async login(data) {
+    pipe()(data)
   }
 }

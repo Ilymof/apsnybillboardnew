@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "skipLibCheck": true,
+    "allowJs": true,
+    "noImplicitAny": true,
+    "preserveWatchOutput": true,
+    "outDir": "./dist",
+    "baseUrl": ".",
+    "paths": {
+      "*": [
+        "@types/*"
+      ]
+    }
+  },
+  "include": [
+    "**/*.js",
+    "**/*.d.ts"
+  ]
+}
