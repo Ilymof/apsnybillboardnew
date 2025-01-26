@@ -1,8 +1,8 @@
 'use strict';
-const server = require('./transport/http.js')
-const migrations = require('./migrate.js')
-const staticServer = require('./static.js');
-const loadRoutes = require('./loadRoutes.js')
+const server = require('transport/http.js')
+const migrations = require('migrate.js')
+const staticServer = require('static.js');
+const loadRoutes = require('loadRoutes.js')
 const path = require('node:path')
 const apiPath = path.join(process.cwd(), '/src/api');
 

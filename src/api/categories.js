@@ -1,8 +1,8 @@
 'use strict'
 
-const pipe = require('../lib/pipe.js')
-const categoryStorage = require('../storages/categoryStorage.js')
-const UserMapper = require('../mappers/UserMapper.js')
+const pipe = require('lib/pipe.js')
+const categoryStorage = require('storages/categoryStorage.js')
+const UserMapper = require('mappers/UserMapper.js')
 const { toCategoryContract } = UserMapper()
 
 module.exports = {

@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "main.js",
   "scripts": {
-    "dev": "nodemon ./src/main.js"
+    "dev": "set NODE_PATH=./src&& nodemon ./src/main.js"
   },
   "author": "Yomo",
   "license": "ISC",
