@@ -8,8 +8,6 @@ const apiPath = path.join(process.cwd(), '/src/api');
 
 (async () => {
    const routing = await loadRoutes(apiPath)
-   console.log(routing);
-
    await migrations()
    server(routing, process.env.API_PORT)
    staticServer('src/static/', process.env.STATIC_PORT)

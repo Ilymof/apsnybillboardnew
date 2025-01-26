@@ -19,7 +19,6 @@ const receiveArgs = async (req) => {
 
 const server = (routing, port = '3333') => {
    http.createServer(async (req, res) => {
-      res.writeHead(200, HEADERS);
       const urlObj = new URL(req.url, `http://${req.headers.host}`);
       const id = urlObj.searchParams.get('id');
       const { url, socket } = req;
