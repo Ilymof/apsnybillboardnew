@@ -7,18 +7,18 @@ module.exports = {
     return (await cities.read()).rows;
   },
 
-  async 'read'(id) {
-    return (await cities.read(id)).rows;
+  async 'read'({ id }) {
+    return (await cities.read(Number(id))).rows;
   },
 
   async 'create'(data) {
     await cities.create(data);
   },
   async 'update'(id, data) {
-    await cities.update(id, data);
+    await cities.update(Number(id), data);
   },
 
-  async 'delete'(id) {
-    await cities.delete(id);
+  async 'delete'({ id }) {
+    await cities.delete(Number(id));
   },
 };

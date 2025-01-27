@@ -8,7 +8,7 @@ module.exports = {
     return (await subcategories.read()).rows;
   },
 
-  async 'read'(id) {
+  async 'read'({ id }) {
     return (await subcategories.read(id)).rows;
   },
 
@@ -20,7 +20,7 @@ module.exports = {
     await subcategories.update(id, data);
   },
 
-  async 'delete'(id) {
+  async 'delete'({ id }) {
     await subcategories.delete(id);
   },
 };

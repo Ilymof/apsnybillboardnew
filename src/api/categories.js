@@ -20,19 +20,19 @@ module.exports = {
 			throw error;
 		}
 	},
-	async 'read'(id) {
-		return (await categories.read(id)).rows;
-	  },
-	
-	  async 'create'(data) {
-		await categories.create(data);
-	  },
+	async 'read'({ id }) {
+		return (await categories.read(id));
+	},
 
-	  async 'update'(id, data) {
+	async 'create'(data) {
+		await categories.create(data);
+	},
+
+	async 'update'(id, data) {
 		await categories.update(id, data);
-	  },
-	
-	  async 'delete'(id) {
+	},
+
+	async 'delete'({ id }) {
 		await categories.delete(id);
-	  },
+	},
 }
