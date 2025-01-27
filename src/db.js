@@ -1,5 +1,5 @@
 'use strict'
-const pool = require('./poolDB')
+const pool = require('poolDB.js')
 
 module.exports = (table) => ({
    async query(sql, args) {
@@ -27,7 +27,7 @@ module.exports = (table) => ({
       const sql = `INSERT INTO "${table}" (${fields}) VALUES (${params})`;
       return await pool.query(sql, data);
    },
-   
+
    async update(id, { ...record }) {
       const keys = Object.keys(record);
       const updates = new Array(keys.length);
@@ -42,7 +42,7 @@ module.exports = (table) => ({
       data.push(id);
       return await pool.query(sql, data);
    },
-   
+
    async delete(id) {
       const sql = `DELETE FROM ${table} WHERE id = $1`;
       return await pool.query(sql, [id]);

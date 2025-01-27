@@ -1,9 +1,9 @@
 'use strict'
 
-const pool = require('./poolDB')
+const pool = require('poolDB.js')
 const fs = require('node:fs')
 const path = require('node:path')
-const checkConnection = require('./checkConnection')
+const checkConnection = require('checkConnection.js')
 
 
 const runMigrations = async () => {
