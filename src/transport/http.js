@@ -24,6 +24,7 @@ module.exports = (routing, port) => {
       const { url, socket } = req;
       const urlObj = new URL(req.url, `http://${req.headers.host}`);
       const [place, name, method] = urlObj.pathname.substring(1).split('/');
+
       if (place !== 'api') return void res.end('"Not found"');
       const entity = routing[name];
       if (!entity) return void res.end('"Not found"');

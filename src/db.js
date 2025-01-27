@@ -2,6 +2,7 @@
 const pool = require('poolDB.js')
 
 module.exports = (table) => ({
+   
    async query(sql, args) {
       return await pool.query(sql, args);
    },
