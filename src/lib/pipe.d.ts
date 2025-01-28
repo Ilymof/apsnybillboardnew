@@ -1,4 +1,4 @@
 // src/lib/pipe.d.ts
-declare function pipe<T, R>(...fns: Array<(input: T) => R | Promise<R>>): (input: T) => R | Promise<R>;
+declare function pipe<T, R>(...fns: Array<(input: T) => R>): (input: T) => R;
 
-export = pipe; // Используйте export = для совместимости с CommonJS
+export = pipe; 

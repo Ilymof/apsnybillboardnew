@@ -1,27 +1,28 @@
-'use strict'
-const Left = (value) => ({
-	value,
-	map: () => Left(value),
-	chain: () => Left(value),
-	fold: (f, g) => f(value),
-	toString: () => `Left(${value})`,
-	isLeft: () => true,
-	isRight: () => false
-});
-
+// either.js
 const Right = (value) => ({
-	value,
 	map: (fn) => Right(fn(value)),
 	chain: (fn) => fn(value),
-	fold: (f, g) => g(value),
-	toString: () => `Right(${value})`,
-	isLeft: () => false,
-	isRight: () => true
+	fold: (_, rightFn) => rightFn(value),
+	isRight: true,
+	isLeft: false,
 });
 
-const either = {
-	Left,
-	Right,
+const Left = (error) => ({
+	map: (_) => Left(error),
+	chain: (_) => Left(error),
+	fold: (leftFn, _) => leftFn(error),
+	isRight: false,
+	isLeft: true,
+});
+
+const Either = {
+	of: (value) => Right(value),
+	fromNullable: (value) => (value != null ? Right(value) : Left("Value is null")),
+	map: (fn) => (either) => either.map(fn),
+	chain: (fn) => (either) => either.chain(fn),
+	fold: (leftFn, rightFn) => (either) => either.fold(leftFn, rightFn),
+	Left: (value) => Left(value),
+	Right: (value) => Right(value)
 };
 
-module.exports = { either };
+module.exports = Either;

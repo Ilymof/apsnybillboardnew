@@ -5,7 +5,7 @@ const receiveArgs = async (req) => {
    const buffers = [];
    for await (const chunk of req) buffers.push(chunk);
    const data = Buffer.concat(buffers).toString();
-   return data ? JSON.parse(data) : undefined
+   return data.trim() ? JSON.parse(data) : undefined
 };
 
 const HEADERS = {

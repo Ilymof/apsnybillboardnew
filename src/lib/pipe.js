@@ -1,13 +1,13 @@
 'use strict'
-const isPromise = value =>
-  value !== null && typeof value === 'object' && typeof value.then === 'function';
-
-const pipe = (...fns) => input => {
-  return fns.reduce((result, fn) => {
-    if (typeof fn !== 'function') throw new TypeError('All arguments to pipe must be functions');
-    if (isPromise(result)) return result.then(fn);
-    return fn(result);
-  }, input);
+/**
+ * pipe - Композиция функций слева направо.
+ * @param  {...Function} fns - функции для последовательного применения
+ * @returns {Function} - новая функция, которая принимает начальное значение
+ */
+const pipe = (...fns) => {
+  return (initialValue) => {
+    return fns.reduce((acc, fn) => fn(acc), initialValue);
+  };
 };
 
-module.exports = { pipe }
+module.exports = pipe 
