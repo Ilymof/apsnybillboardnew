@@ -5,8 +5,12 @@
  * @returns {Function} - новая функция, которая принимает начальное значение
  */
 const pipe = (...fns) => {
-  return (initialValue) => {
-    return fns.reduce((acc, fn) => fn(acc), initialValue);
+  return async (initialValue) => {
+    let acc = initialValue;
+    for (const fn of fns) {
+      acc = await fn(acc);
+    }
+    return acc;
   };
 };
 
