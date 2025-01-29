@@ -30,15 +30,23 @@ module.exports = (routing, port) => {
       if (!entity) return void res.end('"Not found"');
       const handler = entity[method];
       if (!handler) return void res.end('"Not found"');
-      if (req.method === 'GET') {
-         const params = Object.fromEntries(urlObj.searchParams.entries());
-         const result = await handler(params);
-         res.end(JSON.stringify(result));
-      } else {
-         const args = await receiveArgs(req);
-         const result = await handler(args);
-         res.end(JSON.stringify(result));
-      }
+
+      let result;
+         if (req.method === 'PUT' || req.method === 'PATCH') {
+            const args = await receiveArgs(req);
+            const id = urlObj.searchParams.get('id');
+            result = await handler(id, args);
+            res.end(JSON.stringify(result));
+         } else if (req.method === 'GET') {
+            const params = Object.fromEntries(urlObj.searchParams.entries());
+            result = await handler(params); 
+            res.end(JSON.stringify(result));
+         } else {
+            const id = urlObj.searchParams.get('id');
+            const args = id ? { id: Number(id) } : await receiveArgs(req);
+            result = await handler(args);
+            res.end(JSON.stringify(result));
+         }
       console.log(`${socket.remoteAddress} ${method} ${url}`);
    }).listen(port);
    console.log(`API on port ${port}`);

@@ -9,7 +9,7 @@ module.exports = {
   },
 
   async 'read'({ id }) {
-    return (await subcategories.read(id)).rows;
+    return (await subcategories.read(Number(id))).rows;
   },
 
   async 'create'(data) {
@@ -17,10 +17,10 @@ module.exports = {
   },
 
   async 'update'(id, data) {
-    await subcategories.update(id, data);
+    await subcategories.update(Number(id), data);
   },
 
   async 'delete'({ id }) {
-    await subcategories.delete(id);
+    await subcategories.delete(Number(id));
   },
 };

@@ -15,7 +15,7 @@ module.exports = {
     await cities.create(data);
   },
   async 'update'(id, data) {
-    await cities.update(Number(id), data);
+    await cities.update(Number(id),data);
   },
 
   async 'delete'({ id }) {
