@@ -18,7 +18,7 @@ module.exports = {
 		}
 	},
 	async 'read'({ id }) {
-		return (await categories.read(id));
+		return (await categories.read(Number(id))).rows;
 	},
 
 	async 'create'(data) {
@@ -26,10 +26,10 @@ module.exports = {
 	},
 
 	async 'update'(id, data) {
-		await categories.update(id, data);
+		await categories.update(Number(id), data);
 	},
 
 	async 'delete'({ id }) {
-		await categories.delete(id);
+		await categories.delete(Number(id));
 	},
 }
