@@ -1,11 +1,7 @@
 const crypto = require('crypto');
-const E = require('../../lib/either.js');
+const E = require('fp-ts/lib/Either')
 
-/**
- * Функция для проверки хеша Telegram-данных
- * @param {Object} data - объект с данными
- * @returns {Either} - Left с ошибкой или Right с объектом данных
- */
+
 const verifyTelegramHash = (data) => {
   const { user } = data;
   const secretKey = process.env.TG_BOT_TOKEN
@@ -22,9 +18,9 @@ const verifyTelegramHash = (data) => {
     .digest('hex');
 
   if (hash === user.hash) {
-    return E.Right(data);
+    return E.right(data);
   } else {
-    return E.Left('Hash mismatch');
+    return E.left('Hash mismatch');
   }
 };
 

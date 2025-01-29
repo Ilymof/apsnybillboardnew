@@ -1,24 +1,35 @@
 'use strict'
-const pipe = require('../lib/pipe')
 const AuthValidator = require('../validators/AuthValidator')
-const E = require('../lib/either')
 const AuthService = require('../services/auth/TelegramService')
 const UserStorage = require('../storages/UserStorege')
+const jwt = require('jsonwebtoken');
+const { pipe } = require('fp-ts/lib/function')
+const E = require('fp-ts/lib/Either')
+const TE = require('fp-ts/lib/TaskEither')
 
 module.exports = {
-	async login(data) {
-		return pipe(
-			E.fromNullable,
+	async login(userData) {
+		const result = pipe(
+			userData,
+			E.fromNullable('Ошибка: userData отсутствует'),
 			E.chain(AuthValidator.login),
 			E.chain(AuthService.verifyTelegramHash),
-			E.chain(async body => {
-				const user = await UserStorage.getUserByProviderAndId(body.provider, body.id).run()
-				return E.fold(E.Left, user => E.of({ user, body }))(user)
-			}),
-			E.chain(({ user, body }) => {
-				console.dir({ user, body })
-				return body
+			TE.fromEither,
+			TE.chain((user) => {
+				return UserStorage.getUserByProviderAndId(user.auth_provider, user.user.id);
 			})
-		)(data)
+		)
+
+		return result().then(E.fold(
+			(error) => console.error('Ошибка:', error),
+			(success) => console.log('Результат:', success)
+		))
 	}
-}
+};
+
+
+
+// TE.fold(
+// 	(e) => console.log(e),
+// 	(r) => consolr.log(r),
+// )

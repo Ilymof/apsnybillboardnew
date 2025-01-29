@@ -8,17 +8,17 @@ module.exports = {
   },
 
   async 'read'({ id }) {
-    return (await cities.read(Number(id))).rows;
+    return (await cities.read(id)).rows;
   },
 
   async 'create'(data) {
     await cities.create(data);
   },
   async 'update'(id, data) {
-    await cities.update(Number(id), data);
+    await cities.update(id, data);
   },
 
   async 'delete'({ id }) {
-    await cities.delete(Number(id));
+    await cities.delete(id);
   },
 };
