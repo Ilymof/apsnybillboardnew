@@ -1,18 +1,26 @@
 {
-  "name": "apsnybillboard",
+  "name": "desk",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "./src/main.js",
   "scripts": {
-    "start": "node index.js"
+    "dev": "set NODE_PATH=./src&& nodemon ./src/main.js"
   },
-  "keywords": [],
-  "author": "",
+  "author": "Yomo",
   "license": "ISC",
   "description": "",
   "dependencies": {
     "dotenv": "^16.4.7",
+    "fp-ts": "^2.16.9",
     "jsonwebtoken": "^9.0.2",
-    "nodemailer": "^6.9.16",
+    "metaschema": "^2.2.1",
     "pg": "^8.13.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.18.0",
+    "@types/node": "^22.10.10",
+    "eslint": "^9.18.0",
+    "globals": "^15.14.0",
+    "nodemon": "^3.1.9",
+    "typescript": "^5.7.3"
   }
 }
