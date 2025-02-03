@@ -4,7 +4,6 @@ const UserMapper = require('mappers/UserMapper.js')
 const { toCategoryContract } = UserMapper()
 const db = require('db.js')
 const categories = db('category')
-const { pipe } = require('fp-ts/lib/function')
 
 module.exports = {
 	async 'read-all'() {

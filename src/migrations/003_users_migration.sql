@@ -4,7 +4,7 @@ CREATE TABLE users (
     id SERIAL PRIMARY KEY, 
     full_name VARCHAR(255) NOT NULL, 
     role_id INT REFERENCES roles(id) ON DELETE SET NULL, 
-    phone VARCHAR(20) UNIQUE NOT NULL,
+    phone VARCHAR(20) UNIQUE,
     telegram VARCHAR(255), 
     whatsapp VARCHAR(255), 
     ip VARCHAR(45), 

@@ -1,35 +1,18 @@
 'use strict'
-const { pipe } = require('fp-ts/lib/function')
 const db = require('../db')
 const user = db('users')
-const TE = require('fp-ts/lib/TaskEither')
-const E = require('fp-ts/lib/Either')
+
 module.exports = {
-	getUserByProviderAndId(provider, id) {
+	async getUserByProviderAndId(provider, id) {
 		const sql = `
       SELECT * FROM users
       WHERE provider_user_id = $1 AND auth_provider = $2;
     `;
 		const values = [id, provider];
-
-		return pipe(
-			TE.tryCatch(
-				async () => {
-					const result = await user.query(sql, values);
-					return E.right(result.rows)
-				},
-				(error) => E.left(`Ошибка при выполнении запроса: ${String(error)}`)
-			),
-			(promise) => promise().then(
-				E.fold(
-					(err) => err,
-					(result) => result
-				)
-			)
-		)
+		return (await user.query(sql, values)).rows
 	},
 
-	insertOrUpdateUser(data) {
+	async insertOrUpdateUser(data) {
 		const sql = `
 		  INSERT INTO users (
 			 full_name, 
@@ -65,7 +48,7 @@ module.exports = {
 
 		const values = [
 			`${data.user.first_name} ${data.user.last_name || ''}`.trim(),
-			1, // Значение role_id по умолчанию
+			1,
 			data.ip,
 			data.useragent,
 			data.auth_provider,
@@ -73,9 +56,6 @@ module.exports = {
 			data.user.username || null,
 		];
 
-		return TE.tryCatch(
-			async () => (await user.query(sql, values)).rows,
-			() => 'Ошибка вставки/обновления пользователя'
-		);
+		return (await user.query(sql, values)).rows
 	}
 }

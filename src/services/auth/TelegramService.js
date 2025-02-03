@@ -1,5 +1,4 @@
 const crypto = require('crypto');
-const E = require('fp-ts/lib/Either')
 
 
 const verifyTelegramHash = (data) => {
@@ -18,9 +17,9 @@ const verifyTelegramHash = (data) => {
     .digest('hex');
 
   if (hash === user.hash) {
-    return E.right(data);
+    return true
   } else {
-    return E.left('Hash mismatch');
+    return false
   }
 };
 

@@ -7,5 +7,4 @@ CREATE TABLE roles (
 );
 
 INSERT INTO roles (name, permissions) VALUES
-('user', ARRAY['create', 'read', 'update', 'delete']),
-('guest', ARRAY['read']);
+('user', ARRAY['create', 'read', 'update', 'delete']);
