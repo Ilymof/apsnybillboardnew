@@ -8,10 +8,9 @@ const categories = db('category')
 module.exports = {
 	async 'read-all'() {
 		try {
-			return pipe(
-				(await categoryStorage.getAll()).rows,
-				toCategoryContract
-			)
+			const res = (await categoryStorage.getAll()).rows
+			return toCategoryContract(res)
+
 		} catch (error) {
 			console.error('Ошибка при выполнении запроса:', error);
 		}
