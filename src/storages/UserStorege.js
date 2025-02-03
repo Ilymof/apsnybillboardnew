@@ -1,8 +1,9 @@
 'use strict'
-
-const db = require('../db.js')
+const { pipe } = require('fp-ts/lib/function')
+const db = require('../db')
 const user = db('users')
 const TE = require('fp-ts/lib/TaskEither')
+const E = require('fp-ts/lib/Either')
 module.exports = {
 	getUserByProviderAndId(provider, id) {
 		const sql = `
@@ -11,13 +12,21 @@ module.exports = {
     `;
 		const values = [id, provider];
 
-		return TE.tryCatch(
-			async () => {
-				const result = await user.query(sql, values);
-				return result.rows.length > 0 ? result.rows[0] : null;
-			},
-			(error) => `Ошибка при выполнении запроса: ${String(error)}`
-		);
+		return pipe(
+			TE.tryCatch(
+				async () => {
+					const result = await user.query(sql, values);
+					return E.right(result.rows)
+				},
+				(error) => E.left(`Ошибка при выполнении запроса: ${String(error)}`)
+			),
+			(promise) => promise().then(
+				E.fold(
+					(err) => err,
+					(result) => result
+				)
+			)
+		)
 	},
 
 	insertOrUpdateUser(data) {

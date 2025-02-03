@@ -16,8 +16,8 @@ module.exports = {
     await subcategories.create(data);
   },
 
-  async 'update'(id, data) {
-    await subcategories.update(id, data);
+  async 'update'({ id, data }) {
+    await subcategories.update(id, { data });
   },
 
   async 'delete'({ id }) {

@@ -9,21 +9,15 @@ const TE = require('fp-ts/lib/TaskEither')
 
 module.exports = {
 	async login(userData) {
-		const result = pipe(
+		return pipe(
 			userData,
 			E.fromNullable('Ошибка: userData отсутствует'),
 			E.chain(AuthValidator.login),
 			E.chain(AuthService.verifyTelegramHash),
-			TE.fromEither,
-			TE.chain((user) => {
-				return UserStorage.getUserByProviderAndId(user.auth_provider, user.user.id);
+			E.chain((user) => {
+				return UserStorage.getUserByProviderAndId(user.auth_provider, user.user.id)
 			})
 		)
-
-		return result().then(E.fold(
-			(error) => console.error('Ошибка:', error),
-			(success) => console.log('Результат:', success)
-		))
 	}
 };
 

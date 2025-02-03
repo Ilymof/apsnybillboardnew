@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "strict": true,
     "target": "ESNext",
     "module": "commonjs",
     "moduleResolution": "node",
@@ -17,6 +18,7 @@
   },
   "include": [
     "**/*.js",
-    "**/*.d.ts"
+    "**/*.d.ts",
+    "src/db.ts"
   ]
 }

@@ -10,6 +10,7 @@
   "description": "",
   "dependencies": {
     "dotenv": "^16.4.7",
+    "effect": "^3.12.7",
     "fp-ts": "^2.16.9",
     "jsonwebtoken": "^9.0.2",
     "metaschema": "^2.2.1",
