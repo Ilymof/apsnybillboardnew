@@ -4,25 +4,39 @@ const AuthService = require('../../../services/auth/TelegramService')
 const UserStorage = require('../../../storages/UserStorege')
 const ValidationError = require('../../../lib/ValidationError')
 const TokenService = require('../../../services/auth/JWTService')
+const TokenStorage = require('../../../storages/TokenStorage')
+const errorHandler = require('../../../lib/errorHandler')
 
 module.exports = async (userData) => {
-  const { auth_provider, user } = userData
+  try {
+    const { auth_provider, user } = userData;
+    const validationResult = AuthValidator.login(userData);
 
-  if (!AuthValidator.login(userData).valid)
-    throw new ValidationError(AuthValidator.login(userData).errors[0])
+    if (!validationResult.valid)
+      throw new ValidationError(validationResult.errors[0]);
 
-  if (!AuthService.verifyTelegramHash(userData))
-    throw new ValidationError('Hash mismatch')
+    if (!AuthService.verifyTelegramHash(userData))
+      throw new ValidationError("Hash mismatch");
 
-  const userAccount = await UserStorage.getUserByProviderAndId(auth_provider, user.id)
+    const userAccount = await UserStorage.getUserByProviderAndId(auth_provider, user.id);
+    let userId;
 
-  if (!userAccount.length) {
-    const newUser = await UserStorage.insertOrUpdateUser(userData)
-    let { auth_provider, provider_user_id } = newUser
-    return TokenService.generateTokens({ auth_provider, provider_user_id })
+    if (!userAccount) {
+      const newUser = await UserStorage.insertOrUpdateUser(userData);
+      userId = newUser.id;
+    } else {
+      userId = userAccount.id;
+    }
+
+    const tokens = TokenService.generateTokens({ auth_provider, id: user.id });
+    await TokenStorage.deleteToken(userId)
+    await TokenStorage.setToken(userId, tokens.refreshToken);
+    return tokens;
+  } catch (error) {
+    throw errorHandler(error)
   }
-  return userAccount
-}
+};
+
 
 // {
 // 	ip: { type: 'string', required: true },

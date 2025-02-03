@@ -9,7 +9,7 @@ module.exports = {
       WHERE provider_user_id = $1 AND auth_provider = $2;
     `;
 		const values = [id, provider];
-		return (await user.query(sql, values)).rows
+		return (await user.query(sql, values)).rows[0]
 	},
 
 	async insertOrUpdateUser(data) {
@@ -56,6 +56,6 @@ module.exports = {
 			data.user.username || null,
 		];
 
-		return (await user.query(sql, values)).rows
+		return (await user.query(sql, values)).rows[0]
 	}
 }
