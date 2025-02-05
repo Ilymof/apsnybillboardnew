@@ -11,6 +11,7 @@ CREATE TABLE users (
     useragent TEXT, 
     auth_provider VARCHAR(50),
     provider_user_id VARCHAR(255), 
+    is_blocked BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT users_provider_unique UNIQUE (provider_user_id, auth_provider) -- Добавлено уникальное ограничение

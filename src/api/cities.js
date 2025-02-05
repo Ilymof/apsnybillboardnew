@@ -5,15 +5,8 @@ const cities = db('city');
 const errorHandler = require('../lib/errorHandler');
 const ValidationError = require('../lib/ValidationError')
 const { CreateCityShema, UpdateCityShema } = require('../shemas/city')
+const safeDbCall = require('../lib/safeDbCall')
 
-// Надо, наверное вынести в lib
-const safeDbCall = async (fn, ...args) => {
-  try {
-    return await fn(...args);
-  } catch (error) {
-    throw errorHandler(error);
-  }
-};
 
 module.exports = {
   'read-all': async () => await safeDbCall(() => cities.read()),
