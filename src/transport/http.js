@@ -26,12 +26,13 @@ module.exports = (routing, port) => {
             const handler = entity[action];
             if (!handler) return res.end('"Not found"');
 
+            const token = req.headers.authorization || null
             const args =
                method === 'GET'
                   ? Object.fromEntries(urlObj.searchParams.entries())
                   : await receiveArgs(req);
 
-            const result = await handler(args);
+            const result = await handler(args, token);
             res.end(JSON.stringify(result));
             console.log(`${socket.remoteAddress} ${req.method} ${url}`);
 
