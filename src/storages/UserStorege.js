@@ -3,17 +3,17 @@ const db = require('../db')
 const user = db('users')
 
 module.exports = {
-	async getUserByProviderAndId(provider, id) {
-		const sql = `
+   async getUserByProviderAndId(provider, id) {
+      const sql = `
       SELECT * FROM users
       WHERE provider_user_id = $1 AND auth_provider = $2;
-    `;
-		const values = [id, provider];
-		return (await user.query(sql, values)).rows[0]
-	},
+    `
+      const values = [id, provider]
+      return (await user.query(sql, values)).rows[0]
+   },
 
-	async insertOrUpdateUser(data) {
-		const sql = `
+   async insertOrUpdateUser(data) {
+      const sql = `
 		  INSERT INTO users (
 			 full_name, 
 			 role_id, 
@@ -44,18 +44,18 @@ module.exports = {
 			 telegram = EXCLUDED.telegram,
 			 updated_at = CURRENT_TIMESTAMP
 		  RETURNING *;
-		`;
+		`
 
-		const values = [
-			`${data.user.first_name} ${data.user.last_name || ''}`.trim(),
-			1,
-			data.ip,
-			data.useragent,
-			data.auth_provider,
-			data.user.id.toString(),
-			data.user.username || null,
-		];
+      const values = [
+         `${data.user.first_name} ${data.user.last_name || ''}`.trim(),
+         1,
+         data.ip,
+         data.useragent,
+         data.auth_provider,
+         data.user.id.toString(),
+         data.user.username || null
+      ]
 
-		return (await user.query(sql, values)).rows[0]
-	}
+      return (await user.query(sql, values)).rows[0]
+   }
 }

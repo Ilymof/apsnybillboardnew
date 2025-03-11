@@ -1,4 +1,5 @@
 'use strict'
+const process = require('node:process')
 
 async function checkConnection(pool) {
    try {

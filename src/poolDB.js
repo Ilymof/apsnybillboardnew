@@ -1,3 +1,4 @@
+const process = require('node:process')
 const pg = require('pg')
 require('dotenv').config()
 

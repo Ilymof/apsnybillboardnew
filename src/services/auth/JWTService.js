@@ -4,33 +4,31 @@ const jwt = require('jsonwebtoken')
 const { JWT } = require('../../config')
 
 const TokenService = {
-  generateTokens(payload) {
-    const accessToken = jwt.sign(payload, JWT.accessSecret, {
-      expiresIn: JWT.accessExpiresIn,
-    })
+   generateTokens(payload) {
+      const accessToken = jwt.sign(payload, JWT.accessSecret, {
+         expiresIn: JWT.accessExpiresIn
+      })
 
-    const refreshToken = jwt.sign(payload, JWT.refreshSecret, {
-      expiresIn: JWT.refreshExpiresIn,
-    })
+      const refreshToken = jwt.sign(payload, JWT.refreshSecret, {
+         expiresIn: JWT.refreshExpiresIn
+      })
 
-    return { accessToken, refreshToken };
-  },
+      return { accessToken, refreshToken }
+   },
 
-  verifyAccessToken(token) {
-    try {
-      return jwt.verify(token, JWT.accessSecret);
-    } catch (error) {
-      return null;
-    }
-  },
+   async verifyAccessToken(token) {
+      await jwt.verify(token, JWT.accessSecret, (err) => {
+         console.dir(err.message)
+      })
+   },
 
-  verifyRefreshToken(token) {
-    try {
-      return jwt.verify(token, JWT.refreshSecret);
-    } catch (error) {
-      return null;
-    }
-  }
+   verifyRefreshToken(token) {
+      try {
+         return jwt.verify(token, JWT.refreshSecret)
+      } catch {
+         return null
+      }
+   }
 }
 
 module.exports = TokenService

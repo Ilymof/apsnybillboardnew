@@ -4,9 +4,9 @@ const db = require('../db.js')
 const category = db('category')
 
 module.exports = {
-  async getAll() {
-    try {
-      const sql = `
+   async getAll() {
+      try {
+         const sql = `
       SELECT 
         c.id AS category_id,
         c.name AS category_name,
@@ -22,9 +22,9 @@ module.exports = {
       ON 
         c.id = s.categoryId;
       `
-      return await category.query(sql);
-    } catch (error) {
-      console.error('Базе плохо')
-    }
-  }
+         return await category.query(sql)
+      } catch {
+         console.error('Базе плохо')
+      }
+   }
 }

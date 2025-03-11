@@ -1,41 +1,41 @@
-'use strict';
+'use strict'
 
-const db = require('db.js');
-const cities = db('city');
-const errorHandler = require('../lib/errorHandler');
+const db = require('db.js')
+const cities = db('city')
+const errorHandler = require('../lib/errorHandler')
 const ValidationError = require('../lib/ValidationError')
 const { CreateCityShema, UpdateCityShema } = require('../shemas/city')
 const safeDbCall = require('../lib/safeDbCall')
 
 
 module.exports = {
-  'read-all': async () => await safeDbCall(() => cities.read()),
+   'read-all': async () => await safeDbCall(() => cities.read()),
 
-  read: async ({ id }) => {
-    if (!Number(id))
-      throw errorHandler(new ValidationError('Ебанат id должен быть числом'))
+   read: async ({ id }) => {
+      if (!Number(id))
+         throw errorHandler(new ValidationError('Ебанат id должен быть числом'))
 
-    return await safeDbCall(() => cities.read(id))
-  },
+      return await safeDbCall(() => cities.read(id))
+   },
 
-  create: async (data) => {
-    if (!CreateCityShema.check(data).valid)
-      throw errorHandler(new ValidationError(CreateCityShema.check(data).errors[0]))
+   create: async (data) => {
+      if (!CreateCityShema.check(data).valid)
+         throw errorHandler(new ValidationError(CreateCityShema.check(data).errors[0]))
 
-    return await safeDbCall(() => cities.create(data))
-  },
+      return await safeDbCall(() => cities.create(data))
+   },
 
-  update: async ({ id, name }) => {
-    if (!UpdateCityShema.check({ id, name }).valid)
-      throw errorHandler(new ValidationError(UpdateCityShema.check({ id, name }).errors[0]))
+   update: async ({ id, name }) => {
+      if (!UpdateCityShema.check({ id, name }).valid)
+         throw errorHandler(new ValidationError(UpdateCityShema.check({ id, name }).errors[0]))
 
-    return await safeDbCall(() => cities.update(id, { name }))
-  },
+      return await safeDbCall(() => cities.update(id, { name }))
+   },
 
-  delete: async ({ id }) => {
-    if (!Number(id))
-      throw errorHandler(new ValidationError('Ебанат id должен быть числом'))
+   delete: async ({ id }) => {
+      if (!Number(id))
+         throw errorHandler(new ValidationError('Ебанат id должен быть числом'))
 
-    return await safeDbCall(() => cities.delete(id))
-  },
-};
+      return await safeDbCall(() => cities.delete(id))
+   }
+}

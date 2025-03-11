@@ -1,25 +1,35 @@
 {
-  "name": "desk",
-  "version": "1.0.0",
-  "main": "./src/main.js",
-  "scripts": {
-    "dev": "set NODE_PATH=./src&& nodemon ./src/main.js"
-  },
-  "author": "Yomo",
-  "license": "ISC",
-  "description": "",
-  "dependencies": {
-    "dotenv": "^16.4.7",
-    "jsonwebtoken": "^9.0.2",
-    "metaschema": "^2.2.1",
-    "pg": "^8.13.1"
-  },
-  "devDependencies": {
-    "@eslint/js": "^9.18.0",
-    "@types/node": "^22.10.10",
-    "eslint": "^9.18.0",
-    "globals": "^15.14.0",
-    "nodemon": "^3.1.9",
-    "typescript": "^5.7.3"
-  }
+   "_moduleAliases": {
+      "@lib": "./src/lib",
+      "@storages": "./src/storages",
+      "@services": "./src/services"
+   },
+   "name": "desk",
+   "version": "1.0.0",
+   "main": "./src/main.js",
+   "scripts": {
+      "dev": "set NODE_PATH=./src&& nodemon ./src/main.js",
+      "lint": "eslint .",
+      "lint:fix": "eslint .  --fix"
+   },
+   "author": "Yomo",
+   "license": "ISC",
+   "description": "",
+   "dependencies": {
+      "dotenv": "^16.4.7",
+      "jsonwebtoken": "^9.0.2",
+      "metaschema": "^2.2.1",
+      "pg": "^8.13.1"
+   },
+   "devDependencies": {
+      "@eslint/js": "^9.20.0",
+      "@types/node": "^22.10.10",
+      "eslint": "^9.20.1",
+      "eslint-config-prettier": "^10.0.1",
+      "eslint-plugin-import": "^2.31.0",
+      "globals": "^15.15.0",
+      "module-alias": "^2.2.3",
+      "nodemon": "^3.1.9",
+      "typescript": "^5.7.3"
+   }
 }
