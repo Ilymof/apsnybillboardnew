@@ -7,7 +7,8 @@ const createListing = async (listing, token) => {
    try {
       const clearToken = removeBearer(token)
       if (!clearToken) throw PermissionError.unauthorized()
-      TokenService.verifyAccessToken(clearToken)
+      const decodedToken = TokenService.decodeToken(clearToken)
+      listing.user_id = decodedToken.sub
       const rawRows = await ListingStorage.create(listing)
       return rawRows
    } catch (error) {

@@ -16,10 +16,10 @@ const TokenService = {
       return { accessToken, refreshToken }
    },
 
-   async verifyAccessToken(token) {
-      await jwt.verify(token, JWT.accessSecret, (err) => {
-         console.dir(err.message)
-      })
+   verifyAccessToken(token) {
+      return jwt.verify(token, JWT.accessSecret, (err) => {
+         console.dir(err)
+      })   
    },
 
    verifyRefreshToken(token) {
@@ -28,6 +28,40 @@ const TokenService = {
       } catch {
          return null
       }
+   },
+   
+   decodeToken(token){
+      try {
+         const decoded = jwt.verify(token, JWT.accessSecret)
+         return decoded 
+      } catch (err) {
+         console.dir(err)
+         throw err 
+      }
+   },
+
+   refreshAccessToken(refreshToken) {
+      const decoded = this.verifyRefreshToken(refreshToken)
+      if (!decoded) {
+         throw new Error('Invalid or expired refresh token')
+      }
+      // Генерируем новый access-токен с тем же payload
+      const payload = {
+         sub: decoded.sub,
+         auth_provider: decoded.auth_provider,
+         provider_user_id: decoded.provider_user_id
+      }
+      const accessToken = jwt.sign(payload, JWT.accessSecret, {
+         expiresIn: JWT.accessExpiresIn
+      })
+      return { accessToken }
+   },
+   logout(refreshToken) {
+      const decoded = this.verifyRefreshToken(refreshToken)
+      if (!decoded) {
+         throw new Error('Invalid or expired refresh token')
+      }
+      return decoded.sub 
    }
 }
 

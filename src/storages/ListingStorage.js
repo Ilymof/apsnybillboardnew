@@ -1,3 +1,4 @@
+/* eslint-disable no-mixed-spaces-and-tabs */
 'use strict'
 const db = require('../db.js')
 const listings = db('listings')
@@ -62,8 +63,74 @@ module.exports = {
    },
    async create(listing) {
       return (await safeDbCall(() => listings.create(listing)))
+   },
+   
+   async get(listingId)  {
+      const sql = `${readSql} WHERE l.id = $1`
+      const values = [listingId]
+      const result = await safeDbCall(() => listings.query(sql, values))
+      return result.rows[0]
+   },
+
+   async update(listingId, userId, updateData)  {
+      const listing = await this.get(listingId)
+      if (!listing) {
+         throw new Error('Listing not found')
+      }
+      if (listing.author_id !== userId) { // Используем author_id, так как это результат JOIN
+         throw new Error('Unauthorized: You are not the owner of this listing')
+      }
+
+      const { title, description, price, images, city_id, category_id, subcategory_id } = updateData
+      const sql = `
+	   UPDATE listings
+	   SET 
+		  title = COALESCE($1, title),
+		  description = COALESCE($2, description),
+		  price = COALESCE($3, price),
+		  images = COALESCE($4, images),
+		  city_id = COALESCE($5, city_id),
+		  category_id = COALESCE($6, category_id),
+		  subcategory_id = COALESCE($7, subcategory_id)
+	   WHERE id = $8 AND user_id = $9
+	   RETURNING *
+	`
+      const values = [
+         title, 
+		 description, 
+		 price, 
+		 images, 
+		 city_id, 
+		 category_id, 
+		 subcategory_id, 
+		 listingId, 
+		 userId
+      ]
+	  const result = await safeDbCall(() => listings.query(sql, values))
+	  return result.rows[0]
+   },
+
+   async delete(listingId, userId) {
+      const listing = await this.get(listingId)
+      if (!listing) {
+	   throw new Error('Listing not found')
+      }
+      if (listing.author_id !== userId) {
+	   throw new Error('Unauthorized: You are not the owner of this listing')
+      }
+
+      const sql = 'DELETE FROM listings WHERE id = $1 AND user_id = $2 RETURNING *'
+      const values = [listingId, userId]
+      const result = await safeDbCall(() => listings.query(sql, values))
+      return result.rows[0]
+   },
+   async getAllUserListings(userId) {
+      const sql = `
+         ${readSql}
+         WHERE l.user_id = $1
+         ORDER BY l.created_at DESC;
+      `
+      const values = [userId]
+      return (await safeDbCall(() => listings.query(sql, values))).rows
    }
 }
-
-
-

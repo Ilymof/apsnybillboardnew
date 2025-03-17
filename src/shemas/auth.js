@@ -10,7 +10,7 @@ const LoginSchema = Schema.from({
       last_name: { type: 'string', required: false },
       hash: { type: 'string', required: true },
       id: { type: 'number', required: true },
-      photo: { type: 'string', required: false },
+      photo_url: { type: 'string', required: false },
       username: { type: 'string', required: false }
    }
 })

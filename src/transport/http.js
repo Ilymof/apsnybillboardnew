@@ -1,5 +1,4 @@
 'use strict'
-const { readSync } = require('node:fs')
 const http = require('node:http')
 const receiveArgs = async (req) => {
    try {

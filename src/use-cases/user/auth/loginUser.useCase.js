@@ -10,6 +10,7 @@ const errorHandler = require('../../../lib/errorHandler')
 
 
 
+
 const loginUser = async (authCredentials) => {
    try {
       validateAuthCredentials(authCredentials)
@@ -40,13 +41,20 @@ const getOrCreateUserAccount = async (authCredentials) => {
    const { auth_provider, user } = authCredentials
    const userAccount = await UserStorage.getUserByProviderAndId(auth_provider, user.id)
 
-   if (userAccount) userAccount
+   if (userAccount) return userAccount
    return UserStorage.insertOrUpdateUser(authCredentials)
 }
 
 const generateAndStoreTokens = async (userId, authCredentials) => {
    const { auth_provider, user } = authCredentials
-   const tokens = TokenService.generateTokens({ auth_provider, id: user.id })
+   
+   const payload = {
+      sub: userId, 
+      auth_provider: auth_provider, 
+      provider_user_id: user.id
+   }
+
+   const tokens = TokenService.generateTokens(payload)
 
    await TokenStorage.deleteToken(userId)
    await TokenStorage.setToken(userId, tokens.refreshToken)
@@ -54,7 +62,52 @@ const generateAndStoreTokens = async (userId, authCredentials) => {
 }
 
 const checkUserNotBlocked = (userAccount) => {
-   if (userAccount.is_bloked)
+   if (userAccount.is_blocked)
       throw PermissionError.accountBlocked()
 }
-module.exports = { loginUser }
+
+const toRefreshToken = async (refreshTokenData) => {
+   try {
+      const refreshToken = refreshTokenData.refreshToken 
+      if (!refreshToken || typeof refreshToken !== 'string') {
+         throw ValidationError.missingField('Refresh token must be a string')
+      }
+      const decoded = TokenService.verifyRefreshToken(refreshToken)
+      if (!decoded) {
+         throw ValidationError.missingField('Invalid or expired refresh token')
+      }
+
+      const storedToken = await TokenStorage.getToken(decoded.sub)
+      if (!storedToken || storedToken !== refreshToken) {
+         throw ValidationError.missingField('Refresh token not found or mismatched')
+      }
+
+      const tokens = TokenService.refreshAccessToken(refreshToken)
+      return tokens
+   } catch (error) {
+      throw errorHandler(error)
+   }
+}
+const logoutUser = async (refreshTokenData) => {
+   try {
+      const refreshToken = refreshTokenData.refreshToken 
+      if (!refreshToken || typeof refreshToken !== 'string') {
+         throw ValidationError.missingField('Refresh token must be a string')
+      }
+      const decoded = TokenService.verifyRefreshToken(refreshToken)
+      if (!decoded) {
+         throw ValidationError.missingField('Invalid or expired refresh token')
+      }
+      const storedToken = await TokenStorage.getToken(decoded.sub)
+      if (!storedToken || storedToken !== refreshToken) {
+         throw ValidationError.missingField('Refresh token not found or mismatched')
+      }
+
+      await TokenStorage.deleteToken(decoded.sub)
+      return { success: true, message: 'Logged out successfully' }
+   } catch (error) {
+      throw errorHandler(error)
+   }
+}
+
+module.exports = { loginUser, toRefreshToken, logoutUser }
