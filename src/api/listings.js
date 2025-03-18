@@ -7,18 +7,20 @@ const deleteListing = require('../use-cases/listing/deleteListing.useCase')
 const getListing = require('../use-cases/listing/getListing.useCase')
 const getUserListing = require('../use-cases/listing/getUserListing.useCase')
 const getUserListings = require('../use-cases/listing/getUserListings.useCase')
+const extendListing = require('../use-cases/listing/extendListing.useCase')
+
 module.exports = {
    async read(queryParams) {
       return await getListings(queryParams)
    },
-   async create(listing, accessToken) {
-      return await createListing(listing, accessToken)
+   async create(rawBody, accessToken) {
+      return await createListing(rawBody, accessToken)
    },
-   async update(listingData, accessToken) {
-      return await updateListing(listingData, accessToken)
+   async update(rawBody, accessToken) {
+      return await updateListing(rawBody, accessToken)
    },
-   async delete(listingData, accessToken) {
-      return await deleteListing(listingData, accessToken)
+   async delete(queryParams, accessToken) {
+      return await deleteListing(queryParams, accessToken)
    },
    async get(queryParams) {
       return await getListing(queryParams)
@@ -28,5 +30,8 @@ module.exports = {
    },
    async userlistings(queryParams, accessToken) {
       return await getUserListings(queryParams, accessToken)
+   },
+   async extend(rawBody, accessToken) {
+      return await extendListing(rawBody, accessToken)
    }
 }

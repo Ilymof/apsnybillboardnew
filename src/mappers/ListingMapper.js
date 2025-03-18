@@ -10,6 +10,7 @@ module.exports = {
          images: data.images,
          created_at: data.created_at,
          updated_at: data.updated_at,
+         expiration_days: data.expiration_days,
          author: {
             id: data.author_id,
             name: data.author_name,

@@ -11,7 +11,8 @@ CREATE TABLE listings (
     price DECIMAL(10, 2) NOT NULL,
     images TEXT[] DEFAULT ARRAY[]::TEXT[], 
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    expiration_days INTEGER CHECK (expiration_days >= 3 AND expiration_days <= 30)
 );
 
 INSERT INTO listings (user_id, city_id, category_id, subcategory_id, title, description, price, images) VALUES

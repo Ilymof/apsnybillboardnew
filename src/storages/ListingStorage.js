@@ -14,6 +14,7 @@ const readSql = `
 		l.price,
 		l.images,
 		l.created_at,
+      l.expiration_days,
 
 		u.id AS author_id,
 		u.full_name AS author_name,

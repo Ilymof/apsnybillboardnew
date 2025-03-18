@@ -6,7 +6,8 @@ const server = require('transport/http.js')
 const staticServer = require('static.js')
 const loadRoutes = require('loadRoutes.js')
 const path = require('node:path')
-const apiPath = path.join(process.cwd(), '/src/api');
+const apiPath = path.join(process.cwd(), '/src/api')
+const autoDelete = require('../src/use-cases/listing/autoDelete.useCase');
 
 (async () => {
    const routing = await loadRoutes(apiPath)
