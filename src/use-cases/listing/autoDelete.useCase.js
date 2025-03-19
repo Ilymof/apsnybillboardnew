@@ -30,8 +30,6 @@ const checkExpiredListings = async () => {
             }
             await ListingStorage.delete(id, author.id)
             console.log(`Listing ${id} expired and deleted`)
-         } else {
-            console.log(`Listing ${id} not yet expired`)
          }
       }
    } catch (error) {
