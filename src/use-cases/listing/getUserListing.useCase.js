@@ -17,11 +17,17 @@ const getUserListing = async (queryParams, token) => {
       if (!listingId) throw new Error('Listing ID is required')
 
       const listing = await ListingStorage.get(listingId)
+   
       if (!listing) throw new Error('Listing not found')
       if (listing.author_id !== userId) {
          throw PermeationError.unauthorized('You are not the owner of this listing')
       }
 
+
+      const {created_at, expiration_days} = listing
+      const createdDate = new Date(created_at)
+      const expiresAt = new Date(createdDate.getTime() + expiration_days * 24 * 60 * 60 * 1000) 
+      listing.expiresAt = expiresAt
       return listing
    } catch (error) {
       throw errorHandler(error)
