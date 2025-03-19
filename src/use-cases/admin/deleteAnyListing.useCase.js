@@ -8,7 +8,7 @@ const errorHandler = require('@lib/errorHandler')
 const removeBearer = require('@lib/removeBearer')
 const PermeationError = require('../../lib/PermeationError')
 
-const deleteListing = async (queryParams, token) => {
+const deleteAnyListing = async (queryParams, token) => {
    try {
       const clearToken = removeBearer(token)
       if (!clearToken) throw PermeationError.unauthorized()
@@ -18,15 +18,7 @@ const deleteListing = async (queryParams, token) => {
 
       const userId = decodedToken.sub
       const { listingId } = queryParams || {} 
-      const listing = await ListingStorage.get(listingId)
-
-      if (!listing) {
-         throw new Error('Listing not found')
-      }
-
-      if (listing.author_id !== userId) {
-         throw new Error('Unauthorized: You are not the owner of this listing')
-      }
+      if (!listingId) throw new Error('Listing ID is required')
 
       const currentListing = await ListingStorage.get(listingId, userId)
       if (!currentListing) throw new Error('Listing not found or access denied')
@@ -48,4 +40,4 @@ const deleteListing = async (queryParams, token) => {
    }
 }
 
-module.exports = deleteListing
+module.exports = deleteAnyListing

@@ -10,7 +10,7 @@ const getUserListings = require('../use-cases/listing/getUserListings.useCase')
 const extendListing = require('../use-cases/listing/extendListing.useCase')
 
 module.exports = {
-   async read(queryParams) {
+   async 'read-all'(queryParams) {
       return await getListings(queryParams)
    },
    async create(rawBody, accessToken) {
@@ -22,7 +22,7 @@ module.exports = {
    async delete(queryParams, accessToken) {
       return await deleteListing(queryParams, accessToken)
    },
-   async get(queryParams) {
+   async read(queryParams) {
       return await getListing(queryParams)
    },
    async userlisting(queryParams, accessToken) {

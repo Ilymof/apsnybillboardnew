@@ -1,6 +1,6 @@
 'use strict'
 
-const db = require('db.js')
+const db = require('../db.js')
 const cities = db('city')
 const errorHandler = require('../lib/errorHandler')
 const ValidationError = require('../lib/ValidationError')
@@ -13,7 +13,7 @@ module.exports = {
 
    read: async ({ id }) => {
       if (!Number(id))
-         throw errorHandler(new ValidationError('Ебанат id должен быть числом'))
+         throw errorHandler(new ValidationError('id должен быть числом'))
 
       return await safeDbCall(() => cities.read(id))
    },
@@ -34,7 +34,7 @@ module.exports = {
 
    delete: async ({ id }) => {
       if (!Number(id))
-         throw errorHandler(new ValidationError('Ебанат id должен быть числом'))
+         throw errorHandler(new ValidationError('id должен быть числом'))
 
       return await safeDbCall(() => cities.delete(id))
    }

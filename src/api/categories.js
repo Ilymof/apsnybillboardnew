@@ -1,8 +1,8 @@
 
-const categoryStorage = require('storages/categoryStorage.js')
-const UserMapper = require('mappers/UserMapper.js')
+const categoryStorage = require('@storages/categoryStorage.js')
+const UserMapper = require('../mappers/UserMapper.js')
 const { toCategoryContract } = UserMapper()
-const db = require('db.js')
+const db = require('../db.js')
 const categories = db('category')
 const safeDbCall = require('../lib/safeDbCall')
 const errorHandler = require('../lib/errorHandler')
@@ -20,7 +20,7 @@ module.exports = {
 
    read: async ({ id }) => {
       if (!Number(id))
-         throw errorHandler(new ValidationError('Ебанат id должен быть числом'))
+         throw errorHandler(new ValidationError('id должен быть числом'))
 
       return await safeDbCall(() => categories.read(id))
    },
@@ -42,7 +42,7 @@ module.exports = {
 
    delete: async ({ id }) => {
       if (!Number(id))
-         throw errorHandler(new ValidationError('Ебанат id должен быть числом'))
+         throw errorHandler(new ValidationError('id должен быть числом'))
 
       return await safeDbCall(() => categories.delete(id))
    }

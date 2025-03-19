@@ -116,9 +116,6 @@ module.exports = {
       if (!listing) {
 	   throw new Error('Listing not found')
       }
-      if (listing.author_id !== userId) {
-	   throw new Error('Unauthorized: You are not the owner of this listing')
-      }
 
       const sql = 'DELETE FROM listings WHERE id = $1 AND user_id = $2 RETURNING *'
       const values = [listingId, userId]

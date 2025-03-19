@@ -16,7 +16,7 @@ module.exports = {
       const sql = `
 		  INSERT INTO users (
 			 full_name, 
-			 role_id, 
+			 role, 
 			 ip, 
 			 useragent, 
 			 auth_provider, 

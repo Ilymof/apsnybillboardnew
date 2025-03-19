@@ -1,16 +1,20 @@
 {
    "_moduleAliases": {
-      "@lib": "./src/lib",
-      "@storages": "./src/storages",
-      "@services": "./src/services"
+      "@lib": "src/lib",
+      "@storages": "src/storages",
+      "@services": "src/services",
+      "transport": "src/transport",
+      "static": "src",
+      "loadRoutes": "src"
    },
    "name": "desk",
    "version": "1.0.0",
    "main": "./src/main.js",
    "scripts": {
+      "start": "node ./src/main.js",
       "dev": "set NODE_PATH=./src&& nodemon ./src/main.js",
       "lint": "eslint .",
-      "lint:fix": "eslint .  --fix"
+      "lint:fix": "eslint . --fix"
    },
    "author": "Yomo",
    "license": "ISC",

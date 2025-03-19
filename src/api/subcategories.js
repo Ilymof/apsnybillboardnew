@@ -1,6 +1,6 @@
 'use strict'
 
-const db = require('db.js')
+const db = require('../db.js')
 const subcategories = db('subcategory')
 const safeDbCall = require('../lib/safeDbCall')
 const { CreateSubcategoryShema, UpdateSubcategoryShema } = require('../shemas/subcategory')
@@ -12,7 +12,7 @@ module.exports = {
 
    read: async ({ id }) => {
       if (!Number(id))
-         throw errorHandler(new ValidationError('Ебанат id должен быть числом'))
+         throw errorHandler(new ValidationError('id должен быть числом'))
 
       return await safeDbCall(() => subcategories.read(id))
    },
@@ -33,7 +33,7 @@ module.exports = {
 
    delete: async ({ id }) => {
       if (!Number(id))
-         throw errorHandler(new ValidationError('Ебанат id должен быть числом'))
+         throw errorHandler(new ValidationError('id должен быть числом'))
 
       return await safeDbCall(() => subcategories.delete(id))
    }

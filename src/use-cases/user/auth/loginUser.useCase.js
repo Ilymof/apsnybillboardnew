@@ -17,8 +17,10 @@ const loginUser = async (authCredentials) => {
       verifyTelegramHash(authCredentials)
       const userAccount = await getOrCreateUserAccount(authCredentials)
       const userId = userAccount.id
+      const userRole = userAccount.role 
+      const isBlocked = userAccount.is_blocked
       checkUserNotBlocked(userAccount)
-      return await generateAndStoreTokens(userId, authCredentials)
+      return await generateAndStoreTokens(userId, userRole, isBlocked, authCredentials)
    } catch (error) {
       throw errorHandler(error)
    }
@@ -45,11 +47,13 @@ const getOrCreateUserAccount = async (authCredentials) => {
    return UserStorage.insertOrUpdateUser(authCredentials)
 }
 
-const generateAndStoreTokens = async (userId, authCredentials) => {
+const generateAndStoreTokens = async (userId, userRole, isBlocked, authCredentials) => {
    const { auth_provider, user } = authCredentials
    
    const payload = {
       sub: userId, 
+      role: userRole,
+      is_blocked: isBlocked,
       auth_provider: auth_provider, 
       provider_user_id: user.id
    }

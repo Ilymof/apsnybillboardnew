@@ -48,6 +48,8 @@ const TokenService = {
       // Генерируем новый access-токен с тем же payload
       const payload = {
          sub: decoded.sub,
+         role: decoded.role,
+         is_blocked: decoded.isBlocked,
          auth_provider: decoded.auth_provider,
          provider_user_id: decoded.provider_user_id
       }

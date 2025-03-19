@@ -3,7 +3,7 @@ DROP TABLE IF EXISTS users CASCADE;
 CREATE TABLE users (
     id SERIAL PRIMARY KEY, 
     full_name VARCHAR(255) NOT NULL, 
-    role_id INT REFERENCES roles(id) ON DELETE SET NULL, 
+    role INT NOT NULL DEFAULT 0,
     phone VARCHAR(20) UNIQUE,
     telegram VARCHAR(255), 
     whatsapp VARCHAR(255), 

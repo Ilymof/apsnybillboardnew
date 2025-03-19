@@ -1,6 +1,8 @@
 'use strict'
 const http = require('node:http')
 const { Buffer } = require('buffer')
+const  restrictAccess = require('../lib/restrictAccess')
+const { ACCESS_CONTROL } = require('../roles')
 
 const receiveArgs = async (req) => {
    try {
@@ -56,6 +58,12 @@ module.exports = (routing, port) => {
                   args = await receiveArgs(req)
                }
             } 
+
+            const cleanUrl = `/api/${name}/${action}`
+            if (Object.keys(ACCESS_CONTROL).includes(cleanUrl)) {
+               req.user = restrictAccess(token, cleanUrl) 
+            }
+
             const result = await handler(args, token)
             res.writeHead(200, { 'Content-Type': 'application/json' })
             res.end(JSON.stringify(result))
@@ -65,8 +73,7 @@ module.exports = (routing, port) => {
             res.writeHead(400, { 'Content-Type': 'application/json' })
             res.end(JSON.stringify({ error: error.message || 'Internal Server Error' }))
          }
+      }).listen(port, '0.0.0.0', () => {
+         console.log(`API server on port ${port}`)
       })
-      .listen(port)
-
-   console.log(`API on port ${port}`)
 }
