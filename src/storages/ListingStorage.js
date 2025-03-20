@@ -43,7 +43,6 @@ const readSql = `
 
 module.exports = { 
    async findByFilters(queryParams){
-      
       const conditions = [
          (p) => p.id && createCondition('l.id', '=', p.id),
          (p) => p.user_id && createCondition('l.user_id', '=', p.user_id),
@@ -54,13 +53,37 @@ module.exports = {
          (p) => p.max_price && createCondition('l.price', '<=', p.max_price)
       ]
 
-      const { sql, values } = new SqlQueryBuilder(readSql)
+      // Формируем WHERE-условие
+      const whereBuilder = new SqlQueryBuilder().createWhere(conditions, queryParams)
+      const whereClause = whereBuilder.whereClause || '' // Если undefined, используем пустую строку
+      const values = whereBuilder.values || [] // Значения для placeholders
+
+      // Запрос для получения данных с пагинацией
+      const { sql: dataSql, values: dataValues } = new SqlQueryBuilder(readSql)
          .createWhere(conditions, queryParams)
          .createOrder('l.created_at', 'DESC')
          .createPagination(queryParams)
          .end()
 
-      return (await safeDbCall(() => listings.query(sql, values))).rows
+      // Запрос для подсчета общего количества
+      const countSql = `
+         SELECT COUNT(*) as total 
+         FROM listings l
+         LEFT JOIN city c ON l.city_id = c.id
+         LEFT JOIN category cat ON l.category_id = cat.id
+         LEFT JOIN subcategory sub ON l.subcategory_id = sub.id
+         ${whereClause}
+      `.trim()
+
+      const [dataResult, countResult] = await Promise.all([
+         safeDbCall(() => listings.query(dataSql, dataValues)),
+         safeDbCall(() => listings.query(countSql, values)) // Используем values от whereBuilder
+      ])
+
+      return {
+         listings: dataResult.rows,
+         total: parseInt(countResult.rows[0].total)
+      }
    },
    async create(listing) {
       return (await safeDbCall(() => listings.create(listing)))

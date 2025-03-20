@@ -7,8 +7,12 @@ const errorHandler = require('../../lib/errorHandler')
 const getListings = async (queryParams) => {
    try {
       ListingValidator.validateQueryParams(queryParams)
-      const rawRows = await ListingStorage.findByFilters(queryParams)
-      return ListingMapper.transformListings(rawRows)
+      const { listings: rawRows, total } = await ListingStorage.findByFilters(queryParams)
+      const transformedListings = ListingMapper.transformListings(rawRows)
+      return {
+         listings: transformedListings,
+         total: total
+      }
    } catch (error) {
       throw errorHandler(error)
    }

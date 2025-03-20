@@ -8,7 +8,8 @@ const path = require('path')
 
 const checkExpiredListings = async () => {
    try {
-      const listings = await getListings({})
+      const result = await getListings({}) 
+      const listings = result.listings || []
       const now = new Date()
 
       for (const listing of listings) {
