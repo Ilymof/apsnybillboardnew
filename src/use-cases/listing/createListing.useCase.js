@@ -24,7 +24,10 @@ const createListing = async (rawBody, token) => {
       const { title, description, price, city_id, category_id, subcategory_id, expiration_days } = fields
       const imagePaths = files.filter(f => f.name === 'images').map(f => f.filepath)
 
-   
+      if (!imagePaths.length) {
+         throw new Error('At least one image is required')
+      }
+
       const expDays = parseInt(expiration_days, 10)
       if (isNaN(expDays) || expDays < 3 || expDays > 30) {
          throw new Error('Expiration days must be between 3 and 30')
@@ -38,7 +41,7 @@ const createListing = async (rawBody, token) => {
          title,
          description,
          price: price ? parseFloat(price) : null,
-         images: imagePaths.length ? imagePaths : [],
+         images: imagePaths, 
          created_at: new Date(),
          expiration_days: expDays
       }

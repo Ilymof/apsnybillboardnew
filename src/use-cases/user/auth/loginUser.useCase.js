@@ -41,10 +41,21 @@ const verifyTelegramHash = (authCredentials) => {
 
 const getOrCreateUserAccount = async (authCredentials) => {
    const { auth_provider, user } = authCredentials
+
    const userAccount = await UserStorage.getUserByProviderAndId(auth_provider, user.id)
 
-   if (userAccount) return userAccount
-   return UserStorage.insertOrUpdateUser(authCredentials)
+   if (!userAccount) {
+      return UserStorage.insertOrUpdateUser(authCredentials)
+   }
+
+   const currentFullName = userAccount.full_name
+   const newFullName = `${user.first_name} ${user.last_name || ''}`.trim()
+
+   if (currentFullName !== newFullName) {
+      return UserStorage.insertOrUpdateUser(authCredentials)
+   }
+
+   return userAccount
 }
 
 const generateAndStoreTokens = async (userId, userRole, isBlocked, authCredentials) => {

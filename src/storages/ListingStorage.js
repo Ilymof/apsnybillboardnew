@@ -42,21 +42,24 @@ const readSql = `
 
 
 module.exports = { 
-   async findByFilters(queryParams){
+   async findByFilters(queryParams) {
       const conditions = [
+         (p) => p.adName && createCondition('l.title', 'ILIKE', `%${p.adName}%`),
          (p) => p.id && createCondition('l.id', '=', p.id),
          (p) => p.user_id && createCondition('l.user_id', '=', p.user_id),
-         (p) => p.city && createCondition('c.name', 'ILIKE', p.city, true),
-         (p) => p.category && createCondition('cat.id', '=', p.category),
-         (p) => p.subcategory && createCondition('sub.id', '=', p.subcategory),
-         (p) => p.min_price && createCondition('l.price', '>=', p.min_price),
-         (p) => p.max_price && createCondition('l.price', '<=', p.max_price)
+         (p) => p.city && createCondition('c.id', '=', p.city),
+         (p) => p.categoryPath && createCondition('cat.path', '=', p.categoryPath),
+         (p) => p.subcategoryPath && createCondition('sub.path', '=', p.subcategoryPath),
+         (p) => p.minPrice && createCondition('l.price', '>=', p.minPrice),
+         (p) => p.maxPrice && createCondition('l.price', '<=', p.maxPrice)
       ]
 
-      // Формируем WHERE-условие
-      const whereBuilder = new SqlQueryBuilder().createWhere(conditions, queryParams)
-      const whereClause = whereBuilder.whereClause || '' // Если undefined, используем пустую строку
-      const values = whereBuilder.values || [] // Значения для placeholders
+      // Формируем WHERE-условие отдельно
+      const activeConditions = conditions.map(fn => fn(queryParams)).filter(Boolean)
+      const whereClause = activeConditions.length 
+         ? `WHERE ${activeConditions.map((_, i) => _.sql.replace('?', `$${i + 1}`)).join(' AND ')}` 
+         : ''
+      const values = activeConditions.map(c => c.value)
 
       // Запрос для получения данных с пагинацией
       const { sql: dataSql, values: dataValues } = new SqlQueryBuilder(readSql)
@@ -77,7 +80,7 @@ module.exports = {
 
       const [dataResult, countResult] = await Promise.all([
          safeDbCall(() => listings.query(dataSql, dataValues)),
-         safeDbCall(() => listings.query(countSql, values)) // Используем values от whereBuilder
+         safeDbCall(() => listings.query(countSql, values))
       ])
 
       return {
@@ -149,7 +152,7 @@ module.exports = {
       const sql = `
          ${readSql}
          WHERE l.user_id = $1
-         ORDER BY l.created_at DESC;
+         ORDER BY l.created_at DESC
       `
       const values = [userId]
       return (await safeDbCall(() => listings.query(sql, values))).rows
