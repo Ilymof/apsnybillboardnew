@@ -6,7 +6,6 @@ const QuryParamsSchema = Schema.from(
    {
       id: { type: 'string', required: false },
       adName: {type: 'string', required: false},
-      user_id: { type: 'string', required: false },
       city: { type: 'string', required: false },
       category: { type: 'string', required: false },
       subcategory: { type: 'string', required: false },

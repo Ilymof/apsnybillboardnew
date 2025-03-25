@@ -46,7 +46,6 @@ module.exports = {
       const conditions = [
          (p) => p.adName && createCondition('l.title', 'ILIKE', `%${p.adName}%`),
          (p) => p.id && createCondition('l.id', '=', p.id),
-         (p) => p.user_id && createCondition('l.user_id', '=', p.user_id),
          (p) => p.city && createCondition('c.id', '=', p.city),
          (p) => p.categoryPath && createCondition('cat.path', '=', p.categoryPath),
          (p) => p.subcategoryPath && createCondition('sub.path', '=', p.subcategoryPath),
@@ -149,12 +148,26 @@ module.exports = {
       return result.rows[0]
    },
    async getAllUserListings(userId) {
-      const sql = `
+      const dataSql = `
          ${readSql}
          WHERE l.user_id = $1
          ORDER BY l.created_at DESC
       `
+      const countSql = `
+         SELECT COUNT(*) as total 
+         FROM listings l
+         WHERE l.user_id = $1
+      `
       const values = [userId]
-      return (await safeDbCall(() => listings.query(sql, values))).rows
+
+      const [dataResult, countResult] = await Promise.all([
+         safeDbCall(() => listings.query(dataSql, values)),
+         safeDbCall(() => listings.query(countSql, values))
+      ])
+
+      return {
+         listings: dataResult.rows,
+         total: parseInt(countResult.rows[0].total)
+      }
    }
 }

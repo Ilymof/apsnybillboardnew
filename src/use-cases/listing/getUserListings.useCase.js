@@ -13,17 +13,20 @@ const getUserListings = async (queryParams,token) => {
       if (!decodedToken) throw PermeationError.unauthorized()
       
       const userId = decodedToken.sub
-      const listings = await ListingStorage.getAllUserListings(userId)
-      const listingsWithExpires = listings.map(listing => {
+      const { listings: rawListings, total } = await ListingStorage.getAllUserListings(userId)
+      const listingsWithExpires = rawListings.map(listing => {
          const { created_at, expiration_days } = listing
          const createdDate = new Date(created_at)
          const expiresAt = new Date(createdDate.getTime() + expiration_days * 24 * 60 * 60 * 1000)
          return {
-            ...listing, // Копируем все существующие поля
-            expiresAt   // Добавляем новое поле
+            ...listing,
+            expiresAt
          }
       })
-      return listingsWithExpires
+      return {
+         listings: listingsWithExpires,
+         total
+      }
    } catch (error) {
       throw errorHandler(error)
    }
