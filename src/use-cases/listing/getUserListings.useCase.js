@@ -4,6 +4,7 @@ const errorHandler = require('@lib/errorHandler')
 const removeBearer = require('@lib/removeBearer')
 const PermeationError = require('../../lib/PermeationError')
 
+
 const getUserListings = async (queryParams,token) => {
    try {
       const clearToken = removeBearer(token)
@@ -15,8 +16,8 @@ const getUserListings = async (queryParams,token) => {
       const userId = decodedToken.sub
       const { listings: rawListings, total } = await ListingStorage.getAllUserListings(userId)
       const listingsWithExpires = rawListings.map(listing => {
-         const { created_at, expiration_days } = listing
-         const createdDate = new Date(created_at)
+         const { updated_at, expiration_days } = listing
+         const createdDate = new Date(updated_at)
          const expiresAt = new Date(createdDate.getTime() + expiration_days * 24 * 60 * 60 * 1000)
          return {
             ...listing,

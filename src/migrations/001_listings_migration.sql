@@ -6,13 +6,16 @@ CREATE TABLE listings (
     city_id INT REFERENCES city(id) ON DELETE CASCADE,
     category_id INT REFERENCES category(id) ON DELETE SET NULL,
     subcategory_id INT REFERENCES subcategory(id) ON DELETE SET NULL,
+    telegram VARCHAR(255),
+    whatsapp VARCHAR(255),
+    phone VARCHAR(255),
     title VARCHAR(255) NOT NULL,
     description TEXT,
     price DECIMAL(10, 2) NOT NULL,
     images TEXT[] DEFAULT ARRAY[]::TEXT[], 
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    expiration_days INTEGER CHECK (expiration_days >= 3 AND expiration_days <= 30)
+    expiration_days INTEGER CHECK (expiration_days >= 1 AND expiration_days <= 30)
 );
 
 INSERT INTO listings (user_id, city_id, category_id, subcategory_id, title, description, price, images) VALUES

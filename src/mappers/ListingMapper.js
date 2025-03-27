@@ -15,9 +15,9 @@ module.exports = {
          author: {
             id: data.author_id,
             name: data.author_name,
-            phone: data.author_phone,
-            telegram: data.author_telegram,
-            whatsapp: data.author_whatsapp
+            authors_phone: data.author_phone,
+            authors_telegram: data.author_telegram,
+            authors_whatsapp: data.author_whatsapp
          },
          category: {
             id: data.category_id,
@@ -29,6 +29,11 @@ module.exports = {
             id: data.subcategory_id,
             name: data.subcategory_name,
             path: data.subcategory_path
+         },
+         contacts:{
+            telegram: data.telegram,
+            whatsapp: data.whatsapp,
+            phone: data.phone
          }
       }))
    }

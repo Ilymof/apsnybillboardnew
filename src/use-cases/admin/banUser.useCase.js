@@ -33,6 +33,10 @@ const banUser = async (args, token) => {
          toLogs: true
       })
    }
+   await db.query(
+      'DELETE FROM tokens WHERE user_id = $1',
+      [userId]
+   )
 
    return { success: true, user: result.rows[0] }
 }

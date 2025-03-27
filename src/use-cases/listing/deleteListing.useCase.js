@@ -7,6 +7,7 @@ const TokenService = require('@services/auth/JWTService')
 const errorHandler = require('@lib/errorHandler')
 const removeBearer = require('@lib/removeBearer')
 const PermeationError = require('../../lib/PermeationError')
+const getUserListings = require('../../use-cases/listing/getUserListings.useCase')
 
 const deleteListing = async (queryParams, token) => {
    try {
@@ -41,8 +42,15 @@ const deleteListing = async (queryParams, token) => {
          }
       }
 
-      const deletedListing = await ListingStorage.delete(listingId, userId)
-      return { success: true, message: 'Listing deleted successfully', listing: deletedListing }
+      await ListingStorage.delete(listingId, userId)
+      const listingsData = await getUserListings({}, clearToken)
+
+      return { 
+         success: true, 
+         message: 'Listing deleted successfully', 
+         listings: listingsData.listings,
+         total: listingsData.total
+      }
    } catch (error) {
       throw errorHandler(error)
    }

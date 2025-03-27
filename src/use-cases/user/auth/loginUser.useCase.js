@@ -7,6 +7,7 @@ const PermissionError = require('../../../lib/PermeationError')
 const TokenService = require('../../../services/auth/JWTService')
 const TokenStorage = require('../../../storages/TokenStorage')
 const errorHandler = require('../../../lib/errorHandler')
+const jwt = require('jsonwebtoken')
 
 
 
@@ -109,9 +110,9 @@ const logoutUser = async (refreshTokenData) => {
       if (!refreshToken || typeof refreshToken !== 'string') {
          throw ValidationError.missingField('Refresh token must be a string')
       }
-      const decoded = TokenService.verifyRefreshToken(refreshToken)
-      if (!decoded) {
-         throw ValidationError.missingField('Invalid or expired refresh token')
+      const decoded = jwt.decode(refreshToken)
+      if (!decoded || !decoded.sub) {
+         throw ValidationError.missingField('Invalid refresh token format')
       }
       const storedToken = await TokenStorage.getToken(decoded.sub)
       if (!storedToken || storedToken !== refreshToken) {

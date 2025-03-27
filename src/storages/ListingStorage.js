@@ -14,7 +14,11 @@ const readSql = `
 		l.price,
 		l.images,
 		l.created_at,
+      l.updated_at,
       l.expiration_days,
+      l.telegram,
+      l.whatsapp,
+      l.phone,
 
 		u.id AS author_id,
 		u.full_name AS author_name,
@@ -98,39 +102,51 @@ module.exports = {
       return result.rows[0]
    },
 
-   async update(listingId, userId, updateData)  {
+   async update(listingId, updateData)  {
+      
       const listing = await this.get(listingId)
       if (!listing) {
          throw new Error('Listing not found')
       }
-      if (listing.author_id !== userId) { // Используем author_id, так как это результат JOIN
-         throw new Error('Unauthorized: You are not the owner of this listing')
-      }
+      // if (listing.author_id !== userId) { // Используем author_id, так как это результат JOIN
+      //    throw new Error('Unauthorized: You are not the owner of this listing')
+      // }
 
-      const { title, description, price, images, city_id, category_id, subcategory_id } = updateData
+      const {title, description, price, images, city_id, category_id, subcategory_id, telegram, whatsapp, phone, expiration_days, updated_at } = updateData
+      
       const sql = `
 	   UPDATE listings
 	   SET 
-		  title = COALESCE($1, title),
-		  description = COALESCE($2, description),
-		  price = COALESCE($3, price),
-		  images = COALESCE($4, images),
-		  city_id = COALESCE($5, city_id),
-		  category_id = COALESCE($6, category_id),
-		  subcategory_id = COALESCE($7, subcategory_id)
-	   WHERE id = $8 AND user_id = $9
-	   RETURNING *
-	`
+         title = COALESCE($1, title),
+         description = COALESCE($2, description),
+         price = COALESCE($3, price),
+         images = COALESCE($4, images),
+         city_id = COALESCE($5, city_id),
+         category_id = COALESCE($6, category_id),
+         subcategory_id = COALESCE($7, subcategory_id),
+         telegram = COALESCE($8, telegram),
+         whatsapp = COALESCE($9, whatsapp),
+         phone = COALESCE($10, phone),
+         expiration_days = COALESCE($11, expiration_days),
+         updated_at  = COALESCE($12, created_at)
+      WHERE id = $13 
+      RETURNING *
+	   `
       const values = [
-         title, 
-		 description, 
-		 price, 
-		 images, 
-		 city_id, 
-		 category_id, 
-		 subcategory_id, 
-		 listingId, 
-		 userId
+         title,
+         description,
+         price,
+         images,
+         city_id,
+         category_id,
+         subcategory_id,
+         telegram,
+         whatsapp,
+         phone,
+         expiration_days,
+         updated_at,
+         listingId
+
       ]
 	  const result = await safeDbCall(() => listings.query(sql, values))
 	  return result.rows[0]

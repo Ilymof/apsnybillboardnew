@@ -36,11 +36,12 @@ const updateListing = async (listingData, token) => {
          imagePaths = fields.images
       }
 
-      const { listingId, title, description, price, city_id, category_id, subcategory_id } = fields
+      const { listingId, title, description, price, city_id, category_id, subcategory_id, telegram, whatsapp, phone, expiration_days, updated_at} = fields
       if (!listingId) throw new Error('Listing ID is required')
 
-      const currentListing = await ListingStorage.get(listingId, userId)
-      if (!currentListing) throw new Error('Listing not found or access denied')
+      const currentListing = await ListingStorage.get(listingId)
+      if (!currentListing) throw new Error('Listing not found')
+      if (currentListing.author_id !== userId) throw new Error('Unauthorized: You are not the owner of this listing')
 
       if (imagePaths && imagePaths.length > 0 && currentListing.images) {
          for (const oldImage of currentListing.images) {
@@ -51,14 +52,19 @@ const updateListing = async (listingData, token) => {
          }
       }
 
-      const updatedListing = await ListingStorage.update(listingId, userId, {
+      const updatedListing = await ListingStorage.update(listingId, {
          title,
          description,
+         telegram,
+         whatsapp,
+         phone,
          price: price ? parseFloat(price) : undefined,
          city_id: city_id ? parseInt(city_id, 10) : undefined,
          category_id: category_id ? parseInt(category_id, 10) : undefined,
          subcategory_id: subcategory_id ? parseInt(subcategory_id, 10) : undefined,
-         images: imagePaths && imagePaths.length > 0 ? imagePaths : currentListing.images
+         images: imagePaths && imagePaths.length > 0 ? imagePaths : currentListing.images,
+         expiration_days,
+         updated_at
       })
 
       return updatedListing

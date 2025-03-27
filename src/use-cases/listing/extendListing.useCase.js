@@ -5,6 +5,7 @@ const TokenService = require('@services/auth/JWTService')
 const errorHandler = require('@lib/errorHandler')
 const removeBearer = require('@lib/removeBearer')
 const PermeationError = require('../../lib/PermeationError')
+const getUserListings = require('../../use-cases/listing/getUserListings.useCase')
 
 const extendListing = async (listingData, token) => {
    try {
@@ -18,8 +19,9 @@ const extendListing = async (listingData, token) => {
       const { listingId, extendDays } = listingData
       if (!listingId) throw new Error('Listing ID is required')
 
-      const currentListing = await ListingStorage.get(listingId, userId)
-      if (!currentListing) throw new Error('Listing not found or access denied')
+      const currentListing = await ListingStorage.get(listingId)
+      if (!currentListing) throw new Error('Listing not found')
+      if (currentListing.author_id !== userId) throw new Error('Unauthorized: You are not the owner of this listing')
 
       const now = new Date()
       const createdDate = new Date(currentListing.created_at)
@@ -30,17 +32,23 @@ const extendListing = async (listingData, token) => {
          throw new Error('Extension only allowed when 2 or fewer days remain')
       }
 
-      const newExpDays = parseInt(extendDays, 10)
-      if (isNaN(newExpDays) || newExpDays < 3 || newExpDays > 30) {
-         throw new Error('Extension days must be between 3 and 30')
+      if (isNaN(extendDays) || extendDays < 1 || extendDays > 30) {
+         throw new Error('Extension days must be between 1 and 30')
       }
 
-      const updatedListing = await ListingStorage.update(listingId, userId, {
-         expiration_days: newExpDays,
-         created_at: new Date() // Сбрасываем дату создания на текущую
+      await ListingStorage.update(listingId, {
+         expiration_days: extendDays,
+         updated_at: new Date() 
       })
 
-      return { success: true, message: 'Listing extended', listing: updatedListing }
+      const listingsData = await getUserListings({}, clearToken)
+
+      return { 
+         success: true, 
+         message: 'Listing extending successfully', 
+         listings: listingsData.listings,
+         total: listingsData.total
+      }
    } catch (error) {
       throw errorHandler(error)
    }

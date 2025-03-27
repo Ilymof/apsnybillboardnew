@@ -7,7 +7,17 @@ const ROLES = {
 }
 
 const ACCESS_CONTROL = {
-   
+
+   '/api/listing/create': [ROLES.USER, ROLES.MODERATOR, ROLES.ADMIN],
+   '/api/listing/update': [ROLES.USER, ROLES.MODERATOR, ROLES.ADMIN],
+   '/api/listing/delete': [ROLES.USER, ROLES.MODERATOR, ROLES.ADMIN],
+   '/api/listing/extend': [ROLES.USER, ROLES.MODERATOR, ROLES.ADMIN],
+   '/api/listing/userlisting': [ROLES.USER, ROLES.MODERATOR, ROLES.ADMIN],
+   '/api/listing/userlistings': [ROLES.USER, ROLES.MODERATOR, ROLES.ADMIN],
+   '/api/user/login': [ROLES.USER, ROLES.MODERATOR, ROLES.ADMIN],
+   '/api/user/refresh': [ROLES.USER, ROLES.MODERATOR, ROLES.ADMIN],
+   '/api/user/logout': [ROLES.USER, ROLES.MODERATOR, ROLES.ADMIN],
+
    '/api/cities/create': [ROLES.ADMIN],
    '/api/cities/update': [ROLES.ADMIN],
    '/api/cities/delete': [ROLES.ADMIN],

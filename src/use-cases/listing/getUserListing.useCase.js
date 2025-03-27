@@ -23,11 +23,15 @@ const getUserListing = async (queryParams, token) => {
          throw PermeationError.unauthorized('You are not the owner of this listing')
       }
 
-
-      const {created_at, expiration_days} = listing
-      const createdDate = new Date(created_at)
+      console.log(listing)
+      
+      const {updated_at, expiration_days} = listing
+      console.log('------', updated_at, expiration_days,'---------')
+      
+      const createdDate = new Date(updated_at)
       const expiresAt = new Date(createdDate.getTime() + expiration_days * 24 * 60 * 60 * 1000) 
       listing.expiresAt = expiresAt
+
       return listing
    } catch (error) {
       throw errorHandler(error)
