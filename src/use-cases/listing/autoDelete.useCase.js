@@ -13,14 +13,14 @@ const checkExpiredListings = async () => {
       const now = new Date()
 
       for (const listing of listings) {
-         const { id, created_at, expiration_days, images, author } = listing
-         const createdDate = new Date(created_at)
+         const { id, updated_at, expiration_days, images, author } = listing
+         const createdDate = new Date(updated_at)
          const expiresAt = new Date(createdDate.getTime() + expiration_days * 24 * 60 * 60 * 1000)    
 
          if (now >= expiresAt) {
             if (images && images.length > 0) {
                for (const image of images) {
-                  const filePath = path.join(__dirname, '../../uploads', image)
+                  const filePath = path.join(__dirname, '../../../uploads', image)
                   console.log(`Deleting file: ${filePath}`)
                   if (fs.existsSync(filePath)) {
                      fs.unlinkSync(filePath)

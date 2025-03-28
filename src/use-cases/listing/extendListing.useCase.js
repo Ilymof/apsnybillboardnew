@@ -23,14 +23,14 @@ const extendListing = async (listingData, token) => {
       if (!currentListing) throw new Error('Listing not found')
       if (currentListing.author_id !== userId) throw new Error('Unauthorized: You are not the owner of this listing')
 
-      const now = new Date()
-      const createdDate = new Date(currentListing.created_at)
-      const expiresAt = new Date(createdDate.getTime() + currentListing.expiration_days * 24 * 60 * 60 * 1000)
-      const daysLeft = Math.ceil((expiresAt - now) / (24 * 60 * 60 * 1000))
+      // const now = new Date()
+      // const createdDate = new Date(currentListing.updated_at)
+      // const expiresAt = new Date(createdDate.getTime() + currentListing.expiration_days * 24 * 60 * 60 * 1000)
+      // const daysLeft = Math.ceil((expiresAt - now) / (24 * 60 * 60 * 1000))
 
-      if (daysLeft > 2) {
-         throw new Error('Extension only allowed when 2 or fewer days remain')
-      }
+      // if (daysLeft > 2) {
+      //    throw new Error('Extension only allowed when 2 or fewer days remain')
+      // }
 
       if (isNaN(extendDays) || extendDays < 1 || extendDays > 30) {
          throw new Error('Extension days must be between 1 and 30')

@@ -45,7 +45,7 @@ const updateListing = async (listingData, token) => {
 
       if (imagePaths && imagePaths.length > 0 && currentListing.images) {
          for (const oldImage of currentListing.images) {
-            const oldFilePath = path.join(__dirname, '../../uploads', oldImage)
+            const oldFilePath = path.join(__dirname, '../../../uploads', oldImage)        
             if (fs.existsSync(oldFilePath)) {
                fs.unlinkSync(oldFilePath)
             }

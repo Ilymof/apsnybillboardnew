@@ -1,8 +1,7 @@
 'use strict'
+const {loginUser, toRefreshToken, logoutUser, check } = require('../use-cases/user/auth/loginUser.useCase.js')
 
-const { loginUser } = require('../use-cases/user/auth/loginUser.useCase.js')
-const { toRefreshToken } = require('../use-cases/user/auth/loginUser.useCase.js')
-const { logoutUser } = require('../use-cases/user/auth/loginUser.useCase.js')
+
 
 module.exports = {
    async login(userData) {
@@ -13,5 +12,9 @@ module.exports = {
    },
    async logout(refreshToken) {
       return await logoutUser(refreshToken)
+   },
+   async 'token-check'(queryParams,accessToken)
+   {
+      return await check(queryParams,accessToken)
    }
 }

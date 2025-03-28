@@ -35,7 +35,7 @@ const deleteListing = async (queryParams, token) => {
      
       if (currentListing.images && currentListing.images.length > 0) {
          for (const image of currentListing.images) {
-            const filePath = path.join(__dirname, '../../uploads', image)
+            const filePath = path.join(__dirname, '../../../uploads', image)
             if (fs.existsSync(filePath)) {
                fs.unlinkSync(filePath) 
             }

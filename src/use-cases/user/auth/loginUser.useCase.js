@@ -7,6 +7,7 @@ const PermissionError = require('../../../lib/PermeationError')
 const TokenService = require('../../../services/auth/JWTService')
 const TokenStorage = require('../../../storages/TokenStorage')
 const errorHandler = require('../../../lib/errorHandler')
+const removeBearer = require('@lib/removeBearer')
 const jwt = require('jsonwebtoken')
 
 
@@ -125,5 +126,17 @@ const logoutUser = async (refreshTokenData) => {
       throw errorHandler(error)
    }
 }
+const check = async (queryParams,token) => {
+   
+   const clearToken = removeBearer(token)
+   if (!clearToken) throw PermissionError.unauthorized()
+   const decodedToken = TokenService.verifyAccessToken(clearToken)
+   let is_alive = false
+   if(decodedToken){
+      is_alive =  true
+   }
+   return is_alive
 
-module.exports = { loginUser, toRefreshToken, logoutUser }
+}
+
+module.exports = { loginUser, toRefreshToken, logoutUser, check }

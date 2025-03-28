@@ -102,37 +102,13 @@ module.exports = {
       return result.rows[0]
    },
 
-   async update(listingId, updateData)  {
-      
+   async update(listingId, updateData) {
       const listing = await this.get(listingId)
       if (!listing) {
          throw new Error('Listing not found')
       }
-      // if (listing.author_id !== userId) { // Используем author_id, так как это результат JOIN
-      //    throw new Error('Unauthorized: You are not the owner of this listing')
-      // }
 
-      const {title, description, price, images, city_id, category_id, subcategory_id, telegram, whatsapp, phone, expiration_days, updated_at } = updateData
-      
-      const sql = `
-	   UPDATE listings
-	   SET 
-         title = COALESCE($1, title),
-         description = COALESCE($2, description),
-         price = COALESCE($3, price),
-         images = COALESCE($4, images),
-         city_id = COALESCE($5, city_id),
-         category_id = COALESCE($6, category_id),
-         subcategory_id = COALESCE($7, subcategory_id),
-         telegram = COALESCE($8, telegram),
-         whatsapp = COALESCE($9, whatsapp),
-         phone = COALESCE($10, phone),
-         expiration_days = COALESCE($11, expiration_days),
-         updated_at  = COALESCE($12, created_at)
-      WHERE id = $13 
-      RETURNING *
-	   `
-      const values = [
+      const {
          title,
          description,
          price,
@@ -144,12 +120,94 @@ module.exports = {
          whatsapp,
          phone,
          expiration_days,
-         updated_at,
-         listingId
+         updated_at
+      } = updateData
 
-      ]
-	  const result = await safeDbCall(() => listings.query(sql, values))
-	  return result.rows[0]
+      const fieldsToUpdate = []
+      const values = []
+      let paramIndex = 1
+
+      if (title !== undefined && title !== null) {
+         fieldsToUpdate.push(`title = $${paramIndex}`)
+         values.push(title)
+         paramIndex++
+      }
+      if (description !== undefined && description !== null) {
+         fieldsToUpdate.push(`description = $${paramIndex}`)
+         values.push(description)
+         paramIndex++
+      }
+      if (telegram !== undefined && telegram !== null) {
+         fieldsToUpdate.push(`telegram = $${paramIndex}`)
+         values.push(telegram)
+         paramIndex++
+      }
+      if (whatsapp !== undefined && whatsapp !== null) {
+         fieldsToUpdate.push(`whatsapp = $${paramIndex}`)
+         values.push(whatsapp)
+         paramIndex++
+      }
+      if (phone !== undefined && phone !== null) {
+         fieldsToUpdate.push(`phone = $${paramIndex}`)
+         values.push(phone)
+         paramIndex++
+      }
+      if (images !== undefined && images !== null) {
+         fieldsToUpdate.push(`images = $${paramIndex}`)
+         values.push(images)
+         paramIndex++
+      }
+
+      // Числовые поля с проверкой
+      if (price !== undefined && price !== null && !isNaN(Number(price))) {
+         fieldsToUpdate.push(`price = $${paramIndex}`)
+         values.push(Number(price)) 
+         paramIndex++
+      }
+      if (city_id !== undefined && city_id !== null && !isNaN(Number(city_id))) {
+         fieldsToUpdate.push(`city_id = $${paramIndex}`)
+         values.push(Number(city_id)) 
+         paramIndex++
+      }
+      if (category_id !== undefined && category_id !== null && !isNaN(Number(category_id))) {
+         fieldsToUpdate.push(`category_id = $${paramIndex}`)
+         values.push(Number(category_id)) 
+         paramIndex++
+      }
+      if (subcategory_id !== undefined && subcategory_id !== null && !isNaN(Number(subcategory_id))) {
+         fieldsToUpdate.push(`subcategory_id = $${paramIndex}`)
+         values.push(Number(subcategory_id)) 
+         paramIndex++
+      }
+      if (expiration_days !== undefined && expiration_days !== null && !isNaN(Number(expiration_days))) {
+         fieldsToUpdate.push(`expiration_days = $${paramIndex}`)
+         values.push(Number(expiration_days)) 
+         paramIndex++
+      }
+      if (updated_at !== undefined && updated_at !== null) {
+         fieldsToUpdate.push(`updated_at = $${paramIndex}`)
+         values.push(updated_at)
+         paramIndex++
+      }
+
+      if (fieldsToUpdate.length === 0) {
+         return listing
+      }
+
+      values.push(listingId)
+
+      const sql = `
+         UPDATE listings
+         SET ${fieldsToUpdate.join(', ')}
+         WHERE id = $${paramIndex}
+         RETURNING *
+      `
+
+      console.log('SQL:', sql)
+      console.log('Values:', values)
+
+      const result = await safeDbCall(() => listings.query(sql, values))
+      return result.rows[0]
    },
 
    async delete(listingId, userId) {

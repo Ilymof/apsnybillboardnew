@@ -17,9 +17,11 @@ const TokenService = {
    },
 
    verifyAccessToken(token) {
-      return jwt.verify(token, JWT.accessSecret, (err) => {
-         console.dir(err)
-      })   
+      try {
+         return jwt.verify(token, JWT.accessSecret)
+      } catch {
+         return null
+      } 
    },
 
    verifyRefreshToken(token) {
