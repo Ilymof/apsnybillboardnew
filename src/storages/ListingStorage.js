@@ -32,6 +32,7 @@ const readSql = `
 		cat.image AS category_image,
 
 		c.name AS city,
+      c.id AS city_id,
 
 		sub.id AS subcategory_id,
 		sub.name AS subcategory_name,

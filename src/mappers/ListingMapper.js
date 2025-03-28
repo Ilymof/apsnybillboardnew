@@ -12,6 +12,7 @@ module.exports = {
          updated_at: data.updated_at,
          expiration_days: data.expiration_days,
          city: data.city,
+         city_id: data.city_id,
          author: {
             id: data.author_id,
             name: data.author_name,
