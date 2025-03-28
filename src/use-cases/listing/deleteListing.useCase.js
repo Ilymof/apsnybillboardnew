@@ -32,11 +32,10 @@ const deleteListing = async (queryParams, token) => {
       const currentListing = await ListingStorage.get(listingId, userId)
       if (!currentListing) throw new Error('Listing not found or access denied')
 
-     
       if (currentListing.images && currentListing.images.length > 0) {
          for (const image of currentListing.images) {
             const filePath = path.join(__dirname, '../../../uploads', image)
-            if (fs.existsSync(filePath)) {
+            if (fs.existsSync(filePath)) {   
                fs.unlinkSync(filePath) 
             }
          }

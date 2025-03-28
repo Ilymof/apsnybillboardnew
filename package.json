@@ -21,12 +21,16 @@
    "description": "",
    "dependencies": {
       "dotenv": "^16.4.7",
+      "imagemin": "^9.0.1",
+      "imagemin-webp": "^8.0.0",
       "jsonwebtoken": "^9.0.2",
       "metaschema": "^2.2.1",
       "pg": "^8.13.1"
    },
    "devDependencies": {
       "@eslint/js": "^9.20.0",
+      "@types/imagemin": "^9.0.1",
+      "@types/imagemin-webp": "^7.0.3",
       "@types/node": "^22.10.10",
       "eslint": "^9.20.1",
       "eslint-config-prettier": "^10.0.1",

@@ -28,6 +28,7 @@ const mimeTypes = {
    '.jpg': 'image/jpeg',
    '.jpeg': 'image/jpeg',
    '.png': 'image/png',
+   '.webp': 'image/webp',
    '.html': 'text/html',
    '.css': 'text/css',
    '.js': 'application/javascript'

@@ -4,9 +4,9 @@ const fs = require('fs')
 const path = require('path')
 const { Buffer } = require('buffer')
 
-const uploadDir = path.join(__dirname, '../../uploads')
-if (!fs.existsSync(uploadDir)) {
-   fs.mkdirSync(uploadDir, { recursive: true })
+const tempDir = path.join(__dirname, '../../tmp')
+if (!fs.existsSync(tempDir)) {
+   fs.mkdirSync(tempDir, { recursive: true })
 }
 
 function parseMultipart(buffer, boundary) {
@@ -52,7 +52,7 @@ async function processMultipart(body, boundary) {
       if (filenameMatch) {
          const filename = filenameMatch[1]
          const uniqueFilename = `${Date.now()}-${Math.round(Math.random() * 1E9)}-${filename}`
-         const filepath = path.join(uploadDir, uniqueFilename)
+         const filepath = path.join(tempDir, uniqueFilename)
 
          await new Promise((resolve, reject) => {
             fs.writeFile(filepath, part.data, (err) => {
@@ -61,7 +61,7 @@ async function processMultipart(body, boundary) {
             })
          })
 
-         files.push({ name, filepath: `${uniqueFilename}` })
+         files.push({ name, filepath })
       } else {
          fields[name] = part.data.toString('utf-8').trim()
       }

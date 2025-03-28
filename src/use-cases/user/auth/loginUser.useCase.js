@@ -135,7 +135,9 @@ const check = async (queryParams,token) => {
    if(decodedToken){
       is_alive =  true
    }
-   return is_alive
+   return {
+      is_alive: is_alive
+   }
 
 }
 
