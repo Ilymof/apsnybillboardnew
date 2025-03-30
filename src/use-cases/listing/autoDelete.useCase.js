@@ -2,30 +2,30 @@
 
 const ListingStorage = require('../../storages/ListingStorage')
 const getListings = require('../listing/readListings.useCase')
-const fs = require('fs')
+const { promises: fs } = require('fs')
 const path = require('path')
-
 
 const checkExpiredListings = async () => {
    try {
-      const result = await getListings({}) 
+      const result = await getListings({})
       const listings = result.listings || []
       const now = new Date()
 
       for (const listing of listings) {
          const { id, updated_at, expiration_days, images, author } = listing
          const createdDate = new Date(updated_at)
-         const expiresAt = new Date(createdDate.getTime() + expiration_days * 24 * 60 * 60 * 1000)    
+         const expiresAt = new Date(createdDate.getTime() + expiration_days * 24 * 60 * 60 * 1000)
 
          if (now >= expiresAt) {
             if (images && images.length > 0) {
                for (const image of images) {
-                  const filePath = path.join(__dirname, '../../../uploads', image)
+                  const filePath = path.join('/uploads', image)
                   console.log(`Deleting file: ${filePath}`)
-                  if (fs.existsSync(filePath)) {
-                     fs.unlinkSync(filePath)
-                  } else {
-                     console.log(`File not found: ${filePath}`)
+                  try {
+                     await fs.access(filePath)
+                     await fs.unlink(filePath)
+                  } catch (err) {
+                     console.log(`File not found or error deleting: ${filePath}`, err.message)
                   }
                }
             }

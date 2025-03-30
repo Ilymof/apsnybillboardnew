@@ -1,6 +1,6 @@
 'use strict'
 
-const fs = require('fs')
+const { promises: fs } = require('fs')
 const path = require('path')
 const ListingStorage = require('@storages/ListingStorage')
 const TokenService = require('@services/auth/JWTService')
@@ -17,24 +17,33 @@ const deleteAnyListing = async (queryParams, token) => {
       if (!decodedToken) throw PermeationError.unauthorized()
 
       const userId = decodedToken.sub
-      const { listingId } = queryParams || {} 
-      if (!listingId) throw new Error('Listing ID is required')
+      const { listingId } = queryParams || {}
+      const listing = await ListingStorage.get(listingId)
+
+      if (!listing) {
+         throw new Error('Listing not found')
+      }
 
       const currentListing = await ListingStorage.get(listingId, userId)
       if (!currentListing) throw new Error('Listing not found or access denied')
 
-     
       if (currentListing.images && currentListing.images.length > 0) {
          for (const image of currentListing.images) {
-            const filePath = path.join(__dirname, '../../../uploads', image)
-            if (fs.existsSync(filePath)) {
-               fs.unlinkSync(filePath) 
+            const filePath = path.join('/uploads', image)
+            try {
+               await fs.access(filePath)
+               await fs.unlink(filePath)
+            } catch (err) {
+               console.error('Failed to delete image:', filePath, err.message)
             }
          }
       }
 
-      const deletedListing = await ListingStorage.delete(listingId, userId)
-      return { success: true, message: 'Listing deleted successfully', listing: deletedListing }
+      const deletedListing = await ListingStorage.deleteAny(listingId, userId)
+      return {
+         message: deletedListing,
+         listing: 'Listing deleted'
+      }
    } catch (error) {
       throw errorHandler(error)
    }

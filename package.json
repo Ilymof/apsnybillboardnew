@@ -16,10 +16,11 @@
       "lint": "eslint .",
       "lint:fix": "eslint . --fix"
    },
-   "author": "Yomo",
+   "author": "Ilymof",
    "license": "ISC",
    "description": "",
    "dependencies": {
+      "cors": "^2.8.5",
       "dotenv": "^16.4.7",
       "imagemin": "^9.0.1",
       "imagemin-webp": "^8.0.0",

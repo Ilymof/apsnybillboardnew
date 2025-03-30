@@ -1,6 +1,6 @@
 'use strict'
 
-const fs = require('fs')
+const { promises: fs } = require('fs')
 const path = require('path')
 const ListingStorage = require('@storages/ListingStorage')
 const TokenService = require('@services/auth/JWTService')
@@ -34,9 +34,12 @@ const deleteListing = async (queryParams, token) => {
 
       if (currentListing.images && currentListing.images.length > 0) {
          for (const image of currentListing.images) {
-            const filePath = path.join(__dirname, '../../../uploads', image)
-            if (fs.existsSync(filePath)) {   
-               fs.unlinkSync(filePath) 
+            const filePath = path.join('/uploads', image)
+            try {
+               await fs.access(filePath)
+               await fs.unlink(filePath)
+            } catch (err) {
+               console.error('Failed to delete image:', filePath, err.message)
             }
          }
       }

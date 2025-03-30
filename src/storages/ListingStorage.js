@@ -222,6 +222,17 @@ module.exports = {
       const result = await safeDbCall(() => listings.query(sql, values))
       return result.rows[0]
    },
+   async deleteAny(listingId) {
+      const listing = await this.get(listingId)
+      if (!listing) {
+	   throw new Error('Listing not found')
+      }
+
+      const sql = 'DELETE FROM listings WHERE id = $1 RETURNING *'
+      const values = [listingId]
+      const result = await safeDbCall(() => listings.query(sql, values))
+      return result.rows[0]
+   },
    async getAllUserListings(userId) {
       const dataSql = `
          ${readSql}

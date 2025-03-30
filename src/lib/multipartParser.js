@@ -1,12 +1,15 @@
 'use strict'
 
-const fs = require('fs')
+const fs = require('fs') // Используем синхронные методы
 const path = require('path')
 const { Buffer } = require('buffer')
 
-const tempDir = path.join(__dirname, '../../tmp')
-if (!fs.existsSync(tempDir)) {
-   fs.mkdirSync(tempDir, { recursive: true })
+// Путь для тома Railway
+const uploadDir = '/uploads'
+
+// Синхронная проверка и создание директории
+if (!fs.existsSync(uploadDir)) {
+   fs.mkdirSync(uploadDir, { recursive: true })
 }
 
 function parseMultipart(buffer, boundary) {
@@ -52,14 +55,9 @@ async function processMultipart(body, boundary) {
       if (filenameMatch) {
          const filename = filenameMatch[1]
          const uniqueFilename = `${Date.now()}-${Math.round(Math.random() * 1E9)}-${filename}`
-         const filepath = path.join(tempDir, uniqueFilename)
+         const filepath = path.join(uploadDir, uniqueFilename)
 
-         await new Promise((resolve, reject) => {
-            fs.writeFile(filepath, part.data, (err) => {
-               if (err) reject(err)
-               else resolve()
-            })
-         })
+         await fs.promises.writeFile(filepath, part.data) // Используем fs.promises внутри async
 
          files.push({ name, filepath })
       } else {

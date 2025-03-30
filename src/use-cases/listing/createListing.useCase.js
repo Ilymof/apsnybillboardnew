@@ -7,7 +7,6 @@ const PermissionError = require('../../lib/PermeationError')
 const { promises: fs } = require('fs')
 const path = require('path')
 
-// Динамический импорт будет выполнен позже в коде
 const createListing = async (rawBody, token) => {
    try {
       const clearToken = removeBearer(token)
@@ -23,10 +22,8 @@ const createListing = async (rawBody, token) => {
 
       const { fields, files } = await processMultipart(rawBody.body, boundary)
 
-      const uploadDir = path.join(__dirname, '../../../uploads')
-      const tempDir = path.join(__dirname, '../../../tmp')
+      const uploadDir = '/uploads'
       await fs.mkdir(uploadDir, { recursive: true })
-      await fs.mkdir(tempDir, { recursive: true })
 
       const imageFiles = files.filter(f => f.name.startsWith('images'))
       const imagePaths = []
@@ -35,25 +32,17 @@ const createListing = async (rawBody, token) => {
          throw new Error('At least one image is required')
       }
 
-      // Динамически импортируем imagemin и imagemin-webp
       const imagemin = (await import('imagemin')).default
       const imageminWebp = (await import('imagemin-webp')).default
 
       for (const file of imageFiles) {
          const originalFilename = path.basename(file.filepath)
          const filename = originalFilename.replace(/\.[^/.]+$/, '.webp')
+         const originalPath = file.filepath // Например, /uploads/16987654321-123456789-photo.jpg
 
-         const tempPath = path.isAbsolute(file.filepath)
-            ? file.filepath
-            : path.join(tempDir, file.filepath)
+         await fs.access(originalPath)
 
-         try {
-            await fs.access(tempPath)
-         } catch (err) {
-            throw new Error(`Input file is missing: ${file.filepath}`)
-         }
-
-         await imagemin([tempPath], {
+         await imagemin([originalPath], {
             destination: uploadDir,
             plugins: [
                imageminWebp({
@@ -62,6 +51,14 @@ const createListing = async (rawBody, token) => {
                })
             ]
          })
+
+         // Удаляем оригинальный файл после конвертации
+         try {
+            await fs.unlink(originalPath)
+            console.log(`Deleted original file: ${originalPath}`)
+         } catch (err) {
+            console.error(`Failed to delete original file: ${originalPath}`, err.message)
+         }
 
          imagePaths.push(filename)
       }
@@ -90,18 +87,6 @@ const createListing = async (rawBody, token) => {
       }
 
       const createdListing = await ListingStorage.create(listing)
-
-      try {
-         const tmpFiles = await fs.readdir(tempDir)
-         for (const tmpFile of tmpFiles) {
-            const filePath = path.join(tempDir, tmpFile)
-            await fs.unlink(filePath)
-            console.log('Deleted temp file:', filePath)
-         }
-      } catch (err) {
-         console.error('Failed to clear temp directory:', err)
-      }
-
       return createdListing
    } catch (error) {
       throw errorHandler(error)

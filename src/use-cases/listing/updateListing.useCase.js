@@ -22,10 +22,8 @@ const updateListing = async (listingData, token) => {
       const contentType = listingData.headers['content-type'] || ''
       let fields, imagePaths
 
-      const uploadDir = path.join(__dirname, '../../../uploads')
-      const tempDir = path.join(__dirname, '../../../tmp')
+      const uploadDir = '/uploads'
       await fs.mkdir(uploadDir, { recursive: true })
-      await fs.mkdir(tempDir, { recursive: true })
 
       if (contentType.includes('multipart/form-data')) {
          const boundary = contentType.split('boundary=')[1]
@@ -41,21 +39,34 @@ const updateListing = async (listingData, token) => {
             const imagemin = (await import('imagemin')).default
             const imageminWebp = (await import('imagemin-webp')).default
 
+            // Удаляем старые изображения перед обработкой новых
+            const currentListing = await ListingStorage.get(fields.listingId)
+            if (currentListing && currentListing.images && currentListing.images.length > 0) {
+               for (const oldImage of currentListing.images) {
+                  const oldFilePath = path.join(uploadDir, oldImage)
+                  try {
+                     await fs.access(oldFilePath)
+                     await fs.unlink(oldFilePath)
+                     console.log(`Deleted old image: ${oldFilePath}`)
+                  } catch (err) {
+                     console.error('Failed to delete old image:', oldFilePath, err.message)
+                  }
+               }
+            }
+
+            // Обрабатываем новые изображения
             for (const file of imageFiles) {
                const originalFilename = path.basename(file.filepath)
                const filename = originalFilename.replace(/\.[^/.]+$/, '.webp')
-
-               const tempPath = path.isAbsolute(file.filepath)
-                  ? file.filepath
-                  : path.join(tempDir, file.filepath)
+               const originalPath = file.filepath
 
                try {
-                  await fs.access(tempPath)
+                  await fs.access(originalPath)
                } catch (err) {
                   throw new Error(`Input file is missing: ${file.filepath}`)
                }
 
-               await imagemin([tempPath], {
+               await imagemin([originalPath], {
                   destination: uploadDir,
                   plugins: [
                      imageminWebp({
@@ -65,17 +76,15 @@ const updateListing = async (listingData, token) => {
                   ]
                })
 
-               imagePaths.push(filename)
-            }
-
-            // Очистка tmp
-            try {
-               const tmpFiles = await fs.readdir(tempDir)
-               for (const tmpFile of tmpFiles) {
-                  await fs.unlink(path.join(tempDir, tmpFile))
+               // Удаляем исходный файл после конвертации
+               try {
+                  await fs.unlink(originalPath)
+                  console.log(`Deleted original file: ${originalPath}`)
+               } catch (err) {
+                  console.error(`Failed to delete original file: ${originalPath}`, err.message)
                }
-            } catch (err) {
-               console.error('Failed to clear temp directory:', err)
+
+               imagePaths.push(filename)
             }
          }
       } else {
@@ -89,19 +98,6 @@ const updateListing = async (listingData, token) => {
       const currentListing = await ListingStorage.get(listingId)
       if (!currentListing) throw new Error('Listing not found')
       if (currentListing.author_id !== userId) throw new Error('Unauthorized: You are not the owner of this listing')
-
-      // Удаление старых изображений, если переданы новые
-      if (imagePaths && imagePaths.length > 0 && currentListing.images) {
-         for (const oldImage of currentListing.images) {
-            const oldFilePath = path.join(__dirname, '../../../uploads', oldImage)
-            try {
-               await fs.access(oldFilePath)
-               await fs.unlink(oldFilePath)
-            } catch (err) {
-               console.error('Failed to delete old image:', oldFilePath, err.message)
-            }
-         }
-      }
 
       const updatedListing = await ListingStorage.update(listingId, {
          title,
