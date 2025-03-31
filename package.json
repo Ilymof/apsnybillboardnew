@@ -26,6 +26,7 @@
       "imagemin-webp": "^8.0.0",
       "jsonwebtoken": "^9.0.2",
       "metaschema": "^2.2.1",
+      "node-cron": "^3.0.3",
       "pg": "^8.13.1"
    },
    "devDependencies": {

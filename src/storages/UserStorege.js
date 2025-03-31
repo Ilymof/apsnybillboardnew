@@ -3,12 +3,12 @@ const db = require('../db')
 const user = db('users')
 
 module.exports = {
-   async getUserByProviderAndId(id, user_ip) {
+   async getUserByProviderAndId(id) {
       const sql = `
       SELECT * FROM users
-      WHERE provider_user_id = $1 AND ip = $2;
+      WHERE provider_user_id = $1;
     `
-      const values = [id, user_ip]
+      const values = [id]
       return (await user.query(sql, values)).rows[0]
    },
 

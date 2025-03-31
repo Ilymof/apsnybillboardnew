@@ -5,6 +5,9 @@ const fs = require('fs').promises
 const path = require('path')
 const restrictAccess = require('../lib/restrictAccess')
 const { ACCESS_CONTROL } = require('../roles')
+const cron = require('node-cron')
+const db = require('../db')
+const token = db('tokens')
 
 const receiveArgs = async (req) => {
    try {
@@ -164,8 +167,17 @@ module.exports = (routing, port) => {
             res.writeHead(400, { 'Content-Type': 'application/json' })
             res.end(JSON.stringify({ error: error.message || 'Internal Server Error' }))
          }
-      })
+      }) 
       .listen(port, '0.0.0.0', () => {
          console.log(`API server on port ${port}`)
-      })
+      }),
+   cron.schedule('0 * * * *', async () => {
+      try {
+         const sql = 'DELETE FROM tokens WHERE expires_at < NOW() RETURNING *;'
+         const result = await token.query(sql)
+         console.log(`Удалено истёкших токенов: ${result.rowCount}`)
+      } catch (error) {
+         console.error('Ошибка очистки токенов:', error)
+      }
+   })
 }

@@ -5,6 +5,7 @@ CREATE TABLE tokens (
     user_id INT REFERENCES users(id) ON DELETE CASCADE, 
     ip VARCHAR(45),
     token VARCHAR(255) NOT NULL, 
+    user_agent TEXT,
     expires_at TIMESTAMP NOT NULL, 
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP 
 );
