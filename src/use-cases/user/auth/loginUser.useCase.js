@@ -92,7 +92,7 @@ const toRefreshToken = async (refreshTokenData) => {
          throw ValidationError.missingField('Invalid or expired refresh token')
       }
 
-      const storedToken = await TokenStorage.getToken(decoded.sub, decoded.user_ip)
+      const storedToken = await TokenStorage.getToken(decoded.sub, refreshToken)
       if (!storedToken || storedToken !== refreshToken) {
          throw ValidationError.missingField('Refresh token not found or mismatched')
       }
