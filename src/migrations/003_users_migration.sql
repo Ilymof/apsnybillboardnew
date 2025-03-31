@@ -10,11 +10,10 @@ CREATE TABLE users (
     ip VARCHAR(45), 
     useragent TEXT, 
     auth_provider VARCHAR(50),
-    provider_user_id VARCHAR(255), 
+    provider_user_id VARCHAR(255) UNIQUE, 
     is_blocked BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT users_provider_unique UNIQUE (provider_user_id, auth_provider) -- Добавлено уникальное ограничение
 );
 
 INSERT INTO users (full_name, role_id, phone, telegram, whatsapp, ip, useragent, auth_provider, provider_user_id)

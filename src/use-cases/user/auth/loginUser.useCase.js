@@ -42,9 +42,9 @@ const verifyTelegramHash = (authCredentials) => {
 }
 
 const getOrCreateUserAccount = async (authCredentials) => {
-   const { auth_provider, user } = authCredentials
+   const {ip, user } = authCredentials
 
-   const userAccount = await UserStorage.getUserByProviderAndId(auth_provider, user.id)
+   const userAccount = await UserStorage.getUserByProviderAndId(user.id,ip)
 
    if (!userAccount) {
       return UserStorage.insertOrUpdateUser(authCredentials)
@@ -61,21 +61,20 @@ const getOrCreateUserAccount = async (authCredentials) => {
 }
 
 const generateAndStoreTokens = async (userId, userRole, isBlocked, authCredentials) => {
-   const { auth_provider, user } = authCredentials
+   const { auth_provider, ip, user } = authCredentials
    
    const payload = {
       sub: userId, 
       role: userRole,
       is_blocked: isBlocked,
       auth_provider: auth_provider, 
+      user_ip: ip,
       provider_user_id: user.id
    }
-
    const tokens = TokenService.generateTokens(payload)
-
-   await TokenStorage.deleteToken(userId)
-   await TokenStorage.setToken(userId, tokens.refreshToken)
+   await TokenStorage.setToken(userId, ip, tokens.refreshToken)
    return tokens
+   
 }
 
 const checkUserNotBlocked = (userAccount) => {
@@ -94,7 +93,7 @@ const toRefreshToken = async (refreshTokenData) => {
          throw ValidationError.missingField('Invalid or expired refresh token')
       }
 
-      const storedToken = await TokenStorage.getToken(decoded.sub)
+      const storedToken = await TokenStorage.getToken(decoded.sub, decoded.user_ip)
       if (!storedToken || storedToken !== refreshToken) {
          throw ValidationError.missingField('Refresh token not found or mismatched')
       }
@@ -115,12 +114,12 @@ const logoutUser = async (refreshTokenData) => {
       if (!decoded || !decoded.sub) {
          throw ValidationError.missingField('Invalid refresh token format')
       }
-      const storedToken = await TokenStorage.getToken(decoded.sub)
+      const storedToken = await TokenStorage.getToken(decoded.sub, decoded.user_ip)
       if (!storedToken || storedToken !== refreshToken) {
          throw ValidationError.missingField('Refresh token not found or mismatched')
       }
 
-      await TokenStorage.deleteToken(decoded.sub)
+      await TokenStorage.deleteToken(decoded.sub, decoded.user_ip)
       return { success: true, message: 'Logged out successfully' }
    } catch (error) {
       throw errorHandler(error)

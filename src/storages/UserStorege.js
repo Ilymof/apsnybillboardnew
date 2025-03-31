@@ -3,12 +3,12 @@ const db = require('../db')
 const user = db('users')
 
 module.exports = {
-   async getUserByProviderAndId(provider, id) {
+   async getUserByProviderAndId(id, user_ip) {
       const sql = `
       SELECT * FROM users
-      WHERE provider_user_id = $1 AND auth_provider = $2;
+      WHERE provider_user_id = $1 AND ip = $2;
     `
-      const values = [id, provider]
+      const values = [id, user_ip]
       return (await user.query(sql, values)).rows[0]
    },
 
@@ -36,7 +36,7 @@ module.exports = {
 			 CURRENT_TIMESTAMP, 
 			 CURRENT_TIMESTAMP
 		  )
-		  ON CONFLICT (provider_user_id, auth_provider) DO UPDATE 
+		  ON CONFLICT (provider_user_id) DO UPDATE 
 		  SET 
 			 full_name = EXCLUDED.full_name,
 			 ip = EXCLUDED.ip,
@@ -48,7 +48,7 @@ module.exports = {
 
       const values = [
          `${data.user.first_name} ${data.user.last_name || ''}`.trim(),
-         1,
+         0,
          data.ip,
          data.useragent,
          data.auth_provider,
