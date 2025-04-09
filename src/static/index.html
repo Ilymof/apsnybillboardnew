@@ -1,21 +1,147 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="ru">
 <head>
-  <title>Авторизация через Telegram</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вход через Facebook</title>
+    <style>
+        body { font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background-color: #f0f2f5; }
+        .container { text-align: center; }
+        .btn { padding: 10px 20px; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; margin: 5px; color: white; }
+        .facebook-btn { background-color: #1877f2; }
+        .facebook-btn:hover { background-color: #165ec9; }
+        .logout-btn { background-color: #dc3545; }
+        .logout-btn:hover { background-color: #c82333; }
+        #result { margin-top: 20px; white-space: pre-wrap; }
+    </style>
 </head>
-
 <body>
-  <h1>Вход через Telegram</h1>
+    <div class="container">
+        <h1>Вход через Facebook</h1>
+        <button class="btn facebook-btn" onclick="facebookLogin()">Войти через Facebook</button>
+        <button class="btn logout-btn" onclick="logout()" style="display: none;" id="logoutBtn">Выйти</button>
+        <div id="result"></div>
+    </div>
+
+    <!-- Facebook JS SDK -->
+    <script>
+        window.fbAsyncInit = function() {
+            FB.init({
+                appId: '1335974950852765', // Ваш App ID
+                cookie: true,
+                xfbml: true,
+                version: 'v22.0'
+            });
+            console.log('Facebook SDK инициализирован');
+            checkLoginStatus();
+        };
+
+        (function(d, s, id) {
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) return;
+            js = d.createElement(s); js.id = id;
+            js.src = "https://connect.facebook.net/en_US/sdk.js";
+            fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));
+
+        // Facebook авторизация
+        function facebookLogin() {
+            FB.login(function(response) {
+                console.log('Ответ от FB.login:', response);
+                if (response.authResponse) {
+                    FB.api('/me', { fields: 'id,first_name,last_name' }, function(user) {
+                        console.log('Сырые данные от Facebook:', user);
+                        if (user.error) {
+                            document.getElementById('result').textContent = 'Ошибка: ' + user.error.message;
+                            return;
+                        }
+                        const userData = {
+                            ip: '127.0.0.1', // Замените на req.ip на сервере
+                            useragent: navigator.userAgent,
+                            auth_provider: 'facebook',
+                            user: {
+                                id: parseInt(user.id) || null,
+                                first_name: user.first_name || '',
+                                last_name: user.last_name || '',
+                                username: '', // Оставляем пустым, так как не запрашиваем
+                                photo_url: '', // Оставляем пустым, так как не запрашиваем
+                                auth_date: Math.floor(Date.now() / 1000),
+                                hash: '' // Генерируется на бэкенде
+                            }
+                        };
+                        console.log('Данные для сервера:', JSON.stringify(userData, null, 2));
+                        sendAuthRequest(userData);
+                    });
+                } else {
+                    console.log('Авторизация отклонена');
+                    document.getElementById('result').textContent = 'Авторизация отклонена';
+                }
+            }, { scope: 'public_profile' });
+        }
+
+        // Отправка запроса на сервер
+        function sendAuthRequest(userData) {
+            fetch('http://localhost:8800/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(userData)
+            })
+            .then(res => {
+                if (!res.ok) throw new Error(`Ошибка сервера: ${res.status} ${res.statusText}`);
+                return res.json();
+            })
+            .then(data => {
+                sessionStorage.setItem('accessToken', data.accessToken);
+                localStorage.setItem('refreshToken', data.refreshToken);
+                document.getElementById('result').textContent = `Вход успешен!\nAccess Token: ${data.accessToken}\nRefresh Token: ${data.refreshToken}`;
+                document.getElementById('logoutBtn').style.display = 'inline-block';
+            })
+            .catch(err => {
+                console.error('Ошибка:', err);
+                document.getElementById('result').textContent = `Ошибка входа: ${err.message}`;
+            });
+        }
+
+        // Выход
+        function logout() {
+            const refreshToken = localStorage.getItem('refreshToken');
+            if (refreshToken) {
+                FB.logout(function(response) {
+                    console.log('Выход из Facebook:', response);
+                    fetch('http://localhost:8800/api/auth/logout', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ refreshToken: refreshToken })
+                    })
+                    .then(res => {
+                        if (res.ok) {
+                            sessionStorage.removeItem('accessToken');
+                            localStorage.removeItem('refreshToken');
+                            document.getElementById('result').textContent = 'Вы успешно вышли';
+                            document.getElementById('logoutBtn').style.display = 'none';
+                        } else {
+                            throw new Error('Ошибка сервера при выходе');
+                        }
+                    })
+                    .catch(err => {
+                        console.error('Ошибка:', err);
+                        document.getElementById('result').textContent = `Ошибка выхода: ${err.message}`;
+                    });
+                });
+            } else {
+                document.getElementById('result').textContent = 'Нет активной сессии для выхода';
+            }
+        }
+
+        // Проверка статуса при загрузке
+        function checkLoginStatus() {
+            const accessToken = sessionStorage.getItem('accessToken');
+            const refreshToken = localStorage.getItem('refreshToken');
+            if (accessToken && refreshToken) {
+                document.getElementById('result').textContent = `Вы уже вошли\nAccess Token: ${accessToken}\nRefresh Token: ${refreshToken}`;
+                document.getElementById('logoutBtn').style.display = 'inline-block';
+            }
+        }
+    </script>
 </body>
-<script async src="https://telegram.org/js/telegram-widget.js?22" 
-data-telegram-login="apsnybilly_bot" 
-data-size="large"
-data-onauth="onTelegramAuth(user)" 
-data-request-access="write"></script>
-<script type="text/javascript">
-  function onTelegramAuth(user) {
-    alert('Logged in as ' + user.first_name + ' ' + user.last_name + ' (' + user.id + (user.username ? ', @' + user.username : '') + ')');
-  }
-</script>
 </html>

@@ -1,5 +1,4 @@
 'use strict'
-
 const { promises: fs } = require('fs')
 const path = require('path')
 const ListingStorage = require('@storages/ListingStorage')
@@ -8,6 +7,7 @@ const errorHandler = require('@lib/errorHandler')
 const removeBearer = require('@lib/removeBearer')
 const { processMultipart } = require('@lib/multipartParser')
 const PermeationError = require('../../lib/PermeationError')
+const crypto = require('crypto')
 
 const updateListing = async (listingData, token) => {
    try {
@@ -39,7 +39,6 @@ const updateListing = async (listingData, token) => {
             const imagemin = (await import('imagemin')).default
             const imageminWebp = (await import('imagemin-webp')).default
 
-            // Удаляем старые изображения перед обработкой новых
             const currentListing = await ListingStorage.get(fields.listingId)
             if (currentListing && currentListing.images && currentListing.images.length > 0) {
                for (const oldImage of currentListing.images) {
@@ -54,10 +53,10 @@ const updateListing = async (listingData, token) => {
                }
             }
 
-            // Обрабатываем новые изображения
             for (const file of imageFiles) {
-               const originalFilename = path.basename(file.filepath)
-               const filename = originalFilename.replace(/\.[^/.]+$/, '.webp')
+               const randomString = crypto.randomBytes(16).toString('hex')
+               const timestamp = Date.now()
+               const newFilename = `${timestamp}${randomString}.webp` // Без тире: 17440575657979f5055947bea8a15080f3fc09005c4a1.webp
                const originalPath = file.filepath
 
                try {
@@ -66,7 +65,7 @@ const updateListing = async (listingData, token) => {
                   throw new Error(`Input file is missing: ${file.filepath}`)
                }
 
-               await imagemin([originalPath], {
+               const convertedFiles = await imagemin([originalPath], {
                   destination: uploadDir,
                   plugins: [
                      imageminWebp({
@@ -76,7 +75,11 @@ const updateListing = async (listingData, token) => {
                   ]
                })
 
-               // Удаляем исходный файл после конвертации
+               const convertedFilePath = convertedFiles[0].destinationPath // Путь к сконвертированному файлу
+               const finalPath = path.join(uploadDir, newFilename)
+
+               await fs.rename(convertedFilePath, finalPath) // Переименовываем файл
+
                try {
                   await fs.unlink(originalPath)
                   console.log(`Deleted original file: ${originalPath}`)
@@ -84,7 +87,7 @@ const updateListing = async (listingData, token) => {
                   console.error(`Failed to delete original file: ${originalPath}`, err.message)
                }
 
-               imagePaths.push(filename)
+               imagePaths.push(newFilename)
             }
          }
       } else {

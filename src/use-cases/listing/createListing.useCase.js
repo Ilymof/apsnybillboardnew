@@ -5,7 +5,8 @@ const removeBearer = require('../../lib/removeBearer')
 const { processMultipart } = require('../../lib/multipartParser')
 const PermissionError = require('../../lib/PermeationError')
 const { promises: fs } = require('fs')
-const path = require('path')
+const path = require('path') // Добавляем path для работы с путями
+const crypto = require('crypto')
 
 const createListing = async (rawBody, token) => {
    try {
@@ -36,13 +37,15 @@ const createListing = async (rawBody, token) => {
       const imageminWebp = (await import('imagemin-webp')).default
 
       for (const file of imageFiles) {
-         const originalFilename = path.basename(file.filepath)
-         const filename = originalFilename.replace(/\.[^/.]+$/, '.webp')
-         const originalPath = file.filepath // Например, /uploads/16987654321-123456789-photo.jpg
+         const randomString = crypto.randomBytes(16).toString('hex')
+         const timestamp = Date.now()
+         const newFilename = `${timestamp}${randomString}.webp` // Без тире: 17440575657979f5055947bea8a15080f3fc09005c4a1.webp
+         const originalPath = file.filepath
 
          await fs.access(originalPath)
 
-         await imagemin([originalPath], {
+         // Конвертируем изображение
+         const convertedFiles = await imagemin([originalPath], {
             destination: uploadDir,
             plugins: [
                imageminWebp({
@@ -52,7 +55,13 @@ const createListing = async (rawBody, token) => {
             ]
          })
 
-         // Удаляем оригинальный файл после конвертации
+         // Предполагаем, что imagemin возвращает путь к сконвертированному файлу
+         const convertedFilePath = convertedFiles[0].destinationPath // Получаем путь к новому файлу
+         const finalPath = path.join(uploadDir, newFilename)
+
+         // Переименовываем сконвертированный файл в нужное имя
+         await fs.rename(convertedFilePath, finalPath)
+
          try {
             await fs.unlink(originalPath)
             console.log(`Deleted original file: ${originalPath}`)
@@ -60,7 +69,7 @@ const createListing = async (rawBody, token) => {
             console.error(`Failed to delete original file: ${originalPath}`, err.message)
          }
 
-         imagePaths.push(filename)
+         imagePaths.push(newFilename)
       }
 
       const { title, description, price, city_id, category_id, subcategory_id, telegram, whatsapp, phone, expiration_days } = fields
